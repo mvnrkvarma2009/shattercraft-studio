@@ -366,20 +366,35 @@ export function runLive() {
     let tgt;
     let cursor;
     let since;
+    let tourActive = apOn;
 
-    if (apOn) {
+    if (tourActive && loop > 0) {
+      shell.takeOver();
+      tourActive = false;
+      view = 'hero';
+      viewAt = T;
+      station = 'FAN';
+      cut = 'glass';
+      ov.isolate = 0;
+      ov.xray = 0;
+      ov.flow = 1;
+      ov.plasma = 1;
+      throttleTarget = 0.25;
+      paused = false;
+      shell.resetOrbit();
+    }
+
+    if (tourActive) {
       view = camName(cyc);
       station = stationAt(cyc);
-      throttleTarget = throttleAt(cyc);
+      cut = 'glass';
+      ov.isolate = cyc >= 3.5 && cyc < 7.0 ? 1 : 0;
+      ov.xray = cyc >= 7.0 && cyc < 14.2 ? 1 : 0;
+      throttleTarget = cyc >= 21.8 ? 0.25 : throttleAt(cyc);
       tgt = camAt(cyc);
       const t0 = SCRIPT.filter((e) => e.cam && e.t <= cyc).pop().t;
       since = cyc - t0;
       cursor = tourCursor(cyc);
-      if (loop > 0 && cyc < 0.8) {
-        const end = tourCursor(DURATION - 0.01);
-        const k = ss(0, 0.8, cyc);
-        cursor = {...cursor, x: end.x + (cursor.x - end.x) * k, y: end.y + (cursor.y - end.y) * k};
-      }
     } else {
       since = T - viewAt;
       tgt = VIEW_FN[view](since);

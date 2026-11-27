@@ -369,28 +369,36 @@ export function runLive() {
   shell.start(({ T, dt, apOn, cyc, loop, off, tier }) => {
     let since = T - viewAt0;
     let cursor;
-    if (apOn) {
-      if (loop > prevLoop) {
-        prevLoop = loop;
-        prevIso = 0;
-      }
+    let tourActive = apOn;
+    if (tourActive && loop > 0) {
+      shell.takeOver();
+      tourActive = false;
+      view = 'cine';
+      viewAt0 = T;
+      windTarget = 6;
+      isoTarget = 0;
+      prevIso = 0;
+      if (tr.on) setTrace(false);
+      if (xray) setXray(false);
+      if (paused) setPaused(false);
+    }
+    if (tourActive) {
       const [t0, v] = scriptView(cyc);
       view = v;
       since = cyc - t0;
       // keep the view's clock running so a takeover continues the move instead of jumping
       viewAt0 = T - since;
-      windTarget = windAt(cyc);
+      windTarget = cyc >= 26.0 ? 6 : windAt(cyc);
       const isoNow = isoAt(cyc);
       if (isoNow > 0.01 && prevIso <= 0.01) isoOnAt = simT;
       prevIso = isoNow;
       isoTarget = isoNow;
+      // Showcase foot-locus traces on leg/front pass and X-Ray internal linkage on side pass
+      const wantTrace = cyc >= 4.2 && cyc < 25.8;
+      if (wantTrace !== tr.on) setTrace(wantTrace);
+      const wantXray = cyc >= 16.8 && cyc < 22.5;
+      if (wantXray !== xray) setXray(wantXray);
       cursor = tourCursorAt(cyc);
-      // from the second loop on, the pointer glides from where the last one left it
-      if (loop > 0 && cyc < 0.8) {
-        const end = tourCursorAt(DURATION - 0.01);
-        const k = ss(0, 0.8, cyc);
-        cursor = { ...cursor, x: end.x + (cursor.x - end.x) * k, y: end.y + (cursor.y - end.y) * k };
-      }
     } else {
       const rk = Math.max(0, 1 - (T - ring.t) / 0.55);
       cursor = { x: -99, y: -99, press: false, drag: false, ring: rk, ringX: ring.x, ringY: ring.y };
