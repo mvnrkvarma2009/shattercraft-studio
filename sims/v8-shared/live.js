@@ -29,8 +29,8 @@ const playText = (p) => (p >= 1 ? '1× SPEED' : `1 / ${Math.round(1 / p)} SPEED`
 const TOUR_DURATION = 22;
 const TOUR_POSES = [
   {t: 0.0, view: 'hero', tx: 0, ty: 0.095, tz: -0.02, az: 52, el: 27, d: 2.08, sx: -48, sy: 10},
-  {t: 3.4, view: 'cyl', tx: -0.075, ty: 0.11, tz: 0.185, az: 22, el: 12, d: 1.18, sx: -40, sy: 14},
-  {t: 7.2, view: 'cyl', tx: -0.075, ty: 0.11, tz: 0.185, az: 38, el: 15, d: 1.15, sx: -40, sy: 14},
+  {t: 3.4, view: 'cyl', tx: 0.089, ty: 0.119, tz: 0.179, az: 22, el: 12, d: 1.28, sx: -10, sy: 10},
+  {t: 7.2, view: 'cyl', tx: 0.089, ty: 0.119, tz: 0.179, az: 38, el: 15, d: 1.26, sx: -10, sy: 10},
   {t: 8.8, view: 'front', tx: 0, ty: 0.068, tz: 0, az: 8, el: 13, d: 1.96, sx: -40, sy: 10},
   {t: 10.8, view: 'valley', tx: 0, ty: 0.14, tz: 0, az: 22, el: 54, d: 2.24, sx: -40, sy: -18},
   {t: 12.8, view: 'side', tx: 0, ty: 0.10, tz: 0, az: 86, el: 17, d: 2.02, sx: -40, sy: 10},
