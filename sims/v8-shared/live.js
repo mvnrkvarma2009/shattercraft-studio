@@ -25,34 +25,36 @@ const wrap = (d) => ((((d + 180) % 360) + 360) % 360) - 180;
 const PLAYS = [1 / 60, 1 / 40, 1 / 20, 1 / 10, 1 / 5, 1 / 2, 1];
 const playText = (p) => (p >= 1 ? '1× SPEED' : `1 / ${Math.round(1 / p)} SPEED`);
 
-// V8 Live Auto-Tour choreography: 24.0s cohesive single-pass reveal in GLASS (no SECTION, no SOLID, no isolate)
-const TOUR_DURATION = 24;
+// V8 Live Auto-Tour choreography: 28.0s cohesive reveal in GLASS (Hero -> Piston/Compression Close-Up -> Timing Front -> Valley/Boost Headers -> X-Ray -> Wireframe -> Hero)
+const TOUR_DURATION = 28;
 const TOUR_POSES = [
   {t: 0.0, view: 'hero', tx: 0, ty: 0.095, tz: -0.02, az: 52, el: 27, d: 2.08, sx: -48, sy: 10},
-  {t: 4.8, view: 'hero', tx: 0, ty: 0.095, tz: -0.02, az: 34, el: 23, d: 2.04, sx: -46, sy: 10},
-  {t: 7.2, view: 'front', tx: 0, ty: 0.068, tz: 0, az: 8, el: 13, d: 1.96, sx: -40, sy: 10},
-  {t: 10.2, view: 'front', tx: 0, ty: 0.072, tz: 0, az: -12, el: 13, d: 1.98, sx: -40, sy: 10},
-  {t: 12.6, view: 'valley', tx: 0, ty: 0.14, tz: 0, az: 22, el: 56, d: 2.26, sx: -40, sy: -20},
-  {t: 15.0, view: 'side', tx: 0, ty: 0.10, tz: 0, az: 86, el: 17, d: 2.02, sx: -40, sy: 10},
-  {t: 18.5, view: 'hero', tx: 0, ty: 0.095, tz: -0.02, az: 58, el: 23, d: 2.06, sx: -46, sy: 10},
-  {t: 21.2, view: 'hero', tx: 0, ty: 0.095, tz: -0.02, az: 34, el: 21, d: 2.18, sx: -48, sy: 10},
-  {t: 23.6, view: 'hero', tx: 0, ty: 0.095, tz: -0.02, az: 46, el: 26, d: 2.04, sx: -50, sy: 10},
+  {t: 4.5, view: 'cyl', tx: -0.075, ty: 0.11, tz: 0.185, az: 22, el: 12, d: 1.18, sx: -40, sy: 14},
+  {t: 10.5, view: 'cyl', tx: -0.075, ty: 0.11, tz: 0.185, az: 38, el: 15, d: 1.15, sx: -40, sy: 14},
+  {t: 12.2, view: 'front', tx: 0, ty: 0.068, tz: 0, az: 8, el: 13, d: 1.96, sx: -40, sy: 10},
+  {t: 14.5, view: 'valley', tx: 0, ty: 0.14, tz: 0, az: 22, el: 54, d: 2.24, sx: -40, sy: -18},
+  {t: 16.5, view: 'side', tx: 0, ty: 0.10, tz: 0, az: 86, el: 17, d: 2.02, sx: -40, sy: 10},
+  {t: 18.8, view: 'hero', tx: 0, ty: 0.095, tz: -0.02, az: 56, el: 23, d: 2.06, sx: -46, sy: 10},
+  {t: 22.0, view: 'hero', tx: 0, ty: 0.095, tz: -0.02, az: 34, el: 21, d: 2.18, sx: -48, sy: 10},
+  {t: 25.0, view: 'hero', tx: 0, ty: 0.095, tz: -0.02, az: 46, el: 26, d: 2.04, sx: -50, sy: 10},
+  {t: 28.0, view: 'hero', tx: 0, ty: 0.095, tz: -0.02, az: 52, el: 27, d: 2.08, sx: -48, sy: 10},
 ];
 const tourCamName = (t) => {
-  if (t < 5.5) return 'hero';
-  if (t < 10.5) return 'front';
-  if (t < 12.8) return 'valley';
-  if (t < 16.8) return 'side';
+  if (t < 4.5) return 'hero';
+  if (t < 10.8) return 'cyl';
+  if (t < 14.0) return 'front';
+  if (t < 16.2) return 'valley';
+  if (t < 18.5) return 'side';
   return 'hero';
 };
 const tourRpmAt = (t) => {
-  if (t < 5.5) return 1100 + (2400 - 1100) * ss(0.4, 5.2, t);
-  if (t < 10.5) return 2400 + (2800 - 2400) * ss(5.5, 8.2, t);
-  if (t < 11.8) return 2800 + (4200 - 2800) * ss(10.5, 11.8, t);
-  if (t < 15.0) return 4200 + (6400 - 4200) * ss(11.8, 14.5, t);
-  if (t < 18.5) return 6400 + (2800 - 6400) * ss(15.0, 16.8, t);
-  if (t < 21.2) return 2800 + (1800 - 2800) * ss(18.5, 20.2, t);
-  return 1800 + (1100 - 1800) * ss(21.2, 23.4, t);
+  if (t < 4.5) return 1100 + (780 - 1100) * ss(2.2, 4.5, t);
+  if (t < 10.5) return 780;
+  if (t < 14.0) return 780 + (2800 - 780) * ss(10.5, 13.5, t);
+  if (t < 18.0) return 2800 + (6400 - 2800) * ss(14.0, 17.2, t);
+  if (t < 22.0) return 6400 + (2600 - 6400) * ss(18.0, 19.6, t);
+  if (t < 25.0) return 2600 + (1600 - 2600) * ss(22.0, 23.5, t);
+  return 1600 + (1100 - 1600) * ss(25.0, 27.6, t);
 };
 const TOUR_KEYS = ['tx', 'ty', 'tz', 'az', 'el', 'd', 'sx', 'sy'];
 function tourCamAt(t) {
@@ -525,14 +527,16 @@ export function runLive() {
       rpmTarget = tourRpmAt(cyc);
       tgt = tourCamAt(cyc);
       cut = 'glass';
-      ov.isolate = 0;
-      ov.boost = cyc >= 11.5 && cyc < 15.0 ? 1 : 0;
-      const wantXray = cyc >= 15.0 && cyc < 18.5;
+      const wantIso = cyc >= 4.2 && cyc < 10.8 ? 1 : 0;
+      ov.isolate = wantIso;
+      solo = !!wantIso;
+      ov.boost = cyc >= 14.0 && cyc < 18.5 ? 1 : 0;
+      const wantXray = cyc >= 18.5 && cyc < 22.0;
       if (xray !== wantXray) {
         xray = wantXray;
         st.eng.setXray?.(xray);
       }
-      const wantWire = cyc >= 18.5 && cyc < 21.2 ? 1 : 0;
+      const wantWire = cyc >= 22.0 && cyc < 25.0 ? 1 : 0;
       if (ov.wire !== wantWire) {
         ov.wire = wantWire;
         st.eng.setWireframe?.(!!wantWire);
