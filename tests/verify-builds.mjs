@@ -869,7 +869,7 @@ async function main() {
           assert.equal(snap.tier, 'HIGH', `v8-live.html Quality Guard downgraded from HIGH to ${snap.tier} within 5.2s`);
           soakTierOk = true;
         }
-        if (soakTierOk && !snap.tourOn && /RESUME/i.test(snap.tourText)) break;
+        if (soakTierOk && sawXray && sawWire) break;
         await page.waitForTimeout(400);
       }
       assert.ok(soakTierOk, 'v8-live.html 5.2s soak check did not complete');
@@ -879,20 +879,12 @@ async function main() {
       assert.ok(sawWire, 'v8-live.html Auto-Tour should visit WIRE CAD wireframe beat');
       const endChip = page.locator('[data-testid="tour-chip"]');
       assert.ok(
-        await endChip.evaluate((el) => !el.classList.contains('on') && /RESUME/i.test(el.textContent || '')),
-        'v8-live.html Auto-Tour should stop automatically after 1 lap with RESUME TOUR',
+        await endChip.evaluate((el) => el.classList.contains('on') && /AUTO TOUR/i.test(el.textContent || '')),
+        'v8-live.html Auto-Tour should continue looping cleanly without stopping after 1 lap',
       );
-      const endHeroOn = await page.locator('#app .tb', {hasText: /^HERO$/}).evaluate((el) => getComputedStyle(el).backgroundColor === 'rgb(18, 13, 10)');
-      const endGlassOn = await page.locator('#app .tb', {hasText: /^GLASS$/}).evaluate((el) => getComputedStyle(el).backgroundColor === 'rgb(18, 13, 10)');
-      const endXrayOn = await page.locator('[data-testid="v8-xray"]').evaluate((el) => getComputedStyle(el).backgroundColor === 'rgb(242, 106, 61)');
-      const endWireOn = await page.locator('[data-testid="v8-wire"]').evaluate((el) => getComputedStyle(el).backgroundColor === 'rgb(242, 106, 61)');
-      assert.ok(endHeroOn, 'v8-live.html should settle in HERO view after 1-lap Auto-Tour stops');
-      assert.ok(endGlassOn, 'v8-live.html should settle in GLASS mode after 1-lap Auto-Tour stops');
-      assert.ok(!endXrayOn, 'v8-live.html should turn X-RAY off after 1-lap Auto-Tour stops');
-      assert.ok(!endWireOn, 'v8-live.html should turn WIRE off after 1-lap Auto-Tour stops');
       assert.deepEqual(errors, [], `Console/page errors during v8-live soak:\n${errors.join('\n')}`);
       await ctx.close();
-      console.log('  [ok] v8-live.html 5.2s Q: HIGH soak + 1-lap continuous GLASS (X-RAY + WIRE) Auto-Tour stop');
+      console.log('  [ok] v8-live.html 5.2s Q: HIGH soak + continuous GLASS (X-RAY + WIRE) Auto-Tour loop');
     }
 
     console.log('\nAll build, layout, WebGL, and interactive verification checks PASSED.');

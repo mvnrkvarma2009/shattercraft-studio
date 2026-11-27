@@ -513,32 +513,12 @@ export function runLive() {
   }
 
   // ------------------------------------------------------------ the frame
-  shell.start(({T, dt, apOn, cyc, loop, off, explode, cutOffset}) => {
+  shell.start(({T, dt, apOn, cyc, off, explode, cutOffset}) => {
     let tgt;
     let cursor;
     let since;
     let solo = false;
-    let activeTour = apOn;
-    if (activeTour && loop > 0) {
-      shell.takeOver();
-      activeTour = false;
-      view = 'hero';
-      viewAt = T;
-      cyl = 1;
-      cut = 'glass';
-      ov.isolate = 0;
-      ov.boost = 0;
-      if (ov.wire) {
-        ov.wire = 0;
-        st.eng.setWireframe?.(false);
-      }
-      if (xray) {
-        xray = false;
-        st.eng.setXray?.(false);
-      }
-      faultI = 0;
-      rpmTarget = 1100;
-    }
+    const activeTour = apOn;
     if (activeTour) {
       view = tourCamName(cyc);
       cyl = 1;
