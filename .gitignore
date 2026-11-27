@@ -1,0 +1,10 @@
+node_modules/
+shattercraft-out/
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+playwright-report/
+test-results/
