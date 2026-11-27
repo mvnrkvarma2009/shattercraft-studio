@@ -5,6 +5,16 @@ Museum-grade procedural 3D CAD mechanical simulators compiled into self-containe
 
 ![Shattercraft Studio Hub](docs/studio-hub.png)
 
+## Why Use & Explore Shattercraft Studio? (What You Get)
+
+Whether you are a **mechanical engineering student, educator, 3D graphics developer, or curious maker**, Shattercraft Studio turns complex textbook kinematics and thermodynamics into hands-on, inspectable machines:
+
+- **Learn By Dissecting Live Physics (Not Canned Animations)** — Every piston, valve lift profile, planetary star gear, Brayton cycle station, and 11-bar Theo Jansen linkage is computed analytically frame-by-frame. Scrub crank angles (`720°` cycle), throttle, boost (`+0.8 bar`), or wind speed (`0–16 m/s`) and watch forces, pressures, and phases respond instantaneously.
+- **See Inside Without Guesswork** — Toggle **Smoked Glass**, **Stencil-Capped Section Cutaways**, **50/50 Split Comparison**, **Cyan-Cobalt X-Ray**, **CAD Wireframe**, or **Axial/Radial Explode**, and click any 3D component to inspect its exact material spec, gear ratio, and live telemetry.
+- **True Zero-Install Portability (`< 1 MB` Standalone HTML)** — Built with procedural Three.js CAD + inline `@fontsource` typography + `esbuild`, every simulator runs directly from `file://` in any browser with **zero internet connection, zero servers, and zero external assets**.
+- **Hear & Capture Every Machine** — Built-in **procedural WebAudio** synthesizes firing-order combustion and spool harmonics in real time, paired with a deterministic **60 fps Playwright + FFmpeg + Python Foley/DSP** pipeline for museum-grade engineering films.
+- **Production Reference for Creative Technologists** — Explore a clean architecture combining procedural mechanical geometry, custom GLSL combustion/plume shaders, calibrated VSM + GTAO studio lighting, and responsive 1600×900 SVG telemetry overlays.
+
 ## Simulators
 
 ### 1. V8 · Four-Stroke Engine (Master Project)
