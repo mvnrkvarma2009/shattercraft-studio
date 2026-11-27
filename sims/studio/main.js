@@ -274,7 +274,7 @@ if (heroFrontEl) {
     background: '#F4F2EC',
     size: 80,
     speed: 52,
-    hold: 16000,
+    hold: 45000,
     dryness: 45,
     pageScale: 104,
     pageAlign: 'top',
