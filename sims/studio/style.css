@@ -51,7 +51,7 @@ html, body {
 .cta04-topbar {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 18px 32px 0;
+  padding: 14px 32px 0;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -112,7 +112,7 @@ html, body {
   position: relative;
   max-width: 1240px;
   margin: 0 auto;
-  padding: 26px 24px 28px;
+  padding: 18px 24px 20px;
   text-align: center;
 }
 
@@ -226,7 +226,7 @@ html, body {
 }
 
 .cta-04 .proof {
-  margin: 14px 0 26px;
+  margin: 10px 0 18px;
   font-size: 13.5px;
   color: #1e130d;
 }

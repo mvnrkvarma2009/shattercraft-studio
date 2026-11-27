@@ -63,6 +63,11 @@ html,body{background:${theme.bg};overflow:hidden}
 .live-help-k{font-weight:700;color:${theme.accent};letter-spacing:.6px}
 .live-help-d{color:${theme.ink}}
 .turn{position:fixed;left:0;right:0;bottom:18px;text-align:center;font:600 12px/1.4 'JetBrains Mono',monospace;letter-spacing:1px;color:${theme.mute};text-transform:uppercase;display:none}
+.live-ctx{position:fixed;z-index:120;min-width:196px;padding:6px;border-radius:6px;border:1px solid ${theme.border};background:${theme.panel};box-shadow:0 16px 38px rgba(15,12,8,.22);display:none;flex-direction:column;gap:2px;font:600 11px/1.35 'JetBrains Mono',Inter,monospace;color:${theme.ink};backdrop-filter:blur(8px)}
+.live-ctx.open{display:flex}
+.live-ctx button{appearance:none;border:0;background:transparent;color:inherit;font:inherit;text-align:left;padding:7px 10px;border-radius:4px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:14px}
+.live-ctx button:hover{background:rgba(242,106,61,.14);color:${theme.accent}}
+.live-ctx kbd{font-size:9.5px;opacity:.55;font-weight:600}
 @keyframes live-blink{50%{opacity:.15}}
 @media (orientation:portrait) and (max-width:820px){.turn{display:block}}
 `;
@@ -124,6 +129,27 @@ export function createLiveShell(opts = {}) {
   const pills = document.createElement('div');
   pills.className = 'live-pills';
   bar.appendChild(pills);
+
+  const goBackToStudio = () => {
+    if (history.length > 1 && document.referrer) {
+      history.back();
+    } else {
+      location.href = 'studio.html';
+    }
+  };
+
+  const backChip = document.createElement('button');
+  backChip.type = 'button';
+  backChip.className = 'live-pill';
+  backChip.dataset.testid = 'back-studio';
+  backChip.title = 'Back to Studio Hub';
+  backChip.textContent = '← STUDIO';
+  backChip.addEventListener('pointerdown', (e) => e.stopPropagation());
+  backChip.addEventListener('click', (e) => {
+    e.stopPropagation();
+    goBackToStudio();
+  });
+  pills.appendChild(backChip);
 
   const tourChip = document.createElement('div');
   tourChip.className = 'tourchip on';
@@ -452,6 +478,12 @@ export function createLiveShell(opts = {}) {
   });
 
   canvas.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'mouse' && e.button === 3) {
+      e.preventDefault();
+      goBackToStudio();
+      return;
+    }
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
     pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
     try {
       canvas.setPointerCapture(e.pointerId);
@@ -465,6 +497,50 @@ export function createLiveShell(opts = {}) {
       dragMoved = true;
       pinchDist0 = pairDist();
       takeOver();
+    }
+  });
+
+  // Custom CAD context menu on right-click (replaces browser <canvas> "Save image as" menu without Back)
+  const ctxMenu = document.createElement('div');
+  ctxMenu.className = 'live-ctx';
+  ctxMenu.innerHTML = [
+    '<button type="button" data-ctx="back"><span>← Back to Studio</span><kbd>BACK</kbd></button>',
+    '<button type="button" data-ctx="reset"><span>Reset Camera</span><kbd>R</kbd></button>',
+    '<button type="button" data-ctx="snap"><span>Save Snapshot PNG</span><kbd>S</kbd></button>',
+    '<button type="button" data-ctx="hud"><span>Toggle HUD</span><kbd>H</kbd></button>',
+  ].join('');
+  document.body.appendChild(ctxMenu);
+  const closeCtx = () => ctxMenu.classList.remove('open');
+  ctxMenu.addEventListener('pointerdown', (e) => e.stopPropagation());
+  ctxMenu.addEventListener('click', (e) => {
+    const act = e.target.closest('button')?.dataset?.ctx;
+    closeCtx();
+    if (act === 'back') goBackToStudio();
+    else if (act === 'reset') { takeOver(); resetOrbit(); }
+    else if (act === 'snap') {
+      try {
+        const a = document.createElement('a');
+        a.download = `${document.title || 'shattercraft'}-snapshot.png`;
+        a.href = canvas.toDataURL('image/png');
+        a.click();
+      } catch (_) { }
+    } else if (act === 'hud') setHidden(!hidden);
+  });
+  addEventListener('pointerdown', closeCtx);
+  canvas.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    const mw = 204;
+    const mh = 148;
+    const x = Math.min(e.clientX, Math.max(8, innerWidth - mw - 8));
+    const y = Math.min(e.clientY, Math.max(8, innerHeight - mh - 8));
+    ctxMenu.style.left = `${x}px`;
+    ctxMenu.style.top = `${y}px`;
+    ctxMenu.classList.add('open');
+  });
+  addEventListener('mouseup', (e) => {
+    if (e.button === 3) {
+      e.preventDefault();
+      goBackToStudio();
     }
   });
 
@@ -529,6 +605,7 @@ export function createLiveShell(opts = {}) {
   canvas.addEventListener(
     'wheel',
     (e) => {
+      if (!e.ctrlKey && Math.abs(e.deltaX) > Math.abs(e.deltaY) * 1.15) return;
       e.preventDefault();
       takeOver();
       off.k = clamp(off.k * Math.exp(e.deltaY * 0.0012), bounds.minK, bounds.maxK);
