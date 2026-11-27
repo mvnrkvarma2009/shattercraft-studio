@@ -9,7 +9,7 @@ import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
 import {buildEngine} from './engine.js';
 
 const V3 = THREE.Vector3;
-export const BG = {top: '#f3f3f4', mid: '#e9eaec', low: '#e3e4e6'};
+export const BG = {top: '#fcfbf9', mid: '#f6f4ef', low: '#ebe7de'};
 
 // look (every field optional, the film's stage when absent): ao, the GTAO blend (0.75); shadow, 'soft' (VSM, a wide
 // blur) or 'hard' (PCF, a crisp edge); studio, 'full' (four soft boxes) or 'plain' (the top box alone, a flatter read
@@ -19,7 +19,7 @@ export const BG = {top: '#f3f3f4', mid: '#e9eaec', low: '#e3e4e6'};
 export function createV8Stage({canvas, look = {}}) {
   const lo = !!look.lo;
   const hard = look.shadow === 'hard';
-  const engineOpts = lo ? (look.engine || {}) : {caps: '#d4d7dc', ...(look.engine || {})};
+  const engineOpts = lo ? (look.engine || {}) : {caps: '#e3ded4', ...(look.engine || {})};
   const renderer = new THREE.WebGLRenderer({canvas, antialias: false, preserveDrawingBuffer: true, powerPreference: 'high-performance'});
   renderer.toneMapping = THREE.NeutralToneMapping;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -73,10 +73,10 @@ export function createV8Stage({canvas, look = {}}) {
   if (lo) gtao.enabled = false;
   composer.addPass(new OutputPass());
 
-  // pale grey museum studio matching GTF-1200: top softbox, side strips, front fill bounce, cool rear rim
+  // warm porcelain studio: top softbox, side strips, front fill bounce, cool rear rim for crisp metal contrast
   if (!lo) {
     const env = new THREE.Scene();
-    env.background = new THREE.Color('#e6e7ea');
+    env.background = new THREE.Color('#f0ede6');
     const box = (w, h, pos, k, tint = '#fffcf7') => {
       const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({color: new THREE.Color(tint).multiplyScalar(k), side: THREE.DoubleSide}));
       m.position.copy(pos);

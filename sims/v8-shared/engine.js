@@ -374,17 +374,17 @@ export function buildEngine(opts = {}) {
     plain ? discGeo((rOut + rRoot) / 2, width, holeR, lo ? Math.max(8, Math.round((rOut + rRoot) / 24)) : 48) : gearGeo(teeth, rOut, rRoot, width, helix, holeR);
   const root = new THREE.Group();
   const M = {
-    black: new THREE.MeshPhysicalMaterial({color: '#141518', roughness: 0.3, metalness: 0.2, clearcoat: 0.7, clearcoatRoughness: 0.18}),
-    blackMatte: new THREE.MeshPhysicalMaterial({color: '#1b1c1f', roughness: 0.55, metalness: 0.15, clearcoat: 0.25}),
-    gunmetal: new THREE.MeshStandardMaterial({color: '#3b4048', roughness: 0.36, metalness: 0.78}),
-    steel: new THREE.MeshStandardMaterial({color: '#cfd2d6', roughness: 0.22, metalness: 1}),
-    chrome: new THREE.MeshStandardMaterial({color: '#eef1f5', roughness: 0.14, metalness: 1}),
-    alu: new THREE.MeshStandardMaterial({color: '#d9dbdf', roughness: 0.3, metalness: 0.85}),
-    bronze: new THREE.MeshStandardMaterial({color: '#b98a55', roughness: 0.3, metalness: 0.9}),
-    crimson: new THREE.MeshPhysicalMaterial({color: '#f26a3d', roughness: 0.32, metalness: 0.18, clearcoat: 0.35}),
+    black: new THREE.MeshPhysicalMaterial({color: '#191b20', roughness: 0.28, metalness: 0.24, clearcoat: 0.72, clearcoatRoughness: 0.16}),
+    blackMatte: new THREE.MeshPhysicalMaterial({color: '#22242a', roughness: 0.48, metalness: 0.22, clearcoat: 0.28}),
+    gunmetal: new THREE.MeshStandardMaterial({color: '#464d57', roughness: 0.3, metalness: 0.86}),
+    steel: new THREE.MeshStandardMaterial({color: '#b8bec7', roughness: 0.2, metalness: 0.96}),
+    chrome: new THREE.MeshStandardMaterial({color: '#e5e9ef', roughness: 0.12, metalness: 1}),
+    alu: new THREE.MeshStandardMaterial({color: '#a3aab4', roughness: 0.27, metalness: 0.9}),
+    bronze: new THREE.MeshStandardMaterial({color: '#b98a55', roughness: 0.28, metalness: 0.92}),
+    crimson: new THREE.MeshPhysicalMaterial({color: '#f26a3d', roughness: 0.3, metalness: 0.22, clearcoat: 0.4}),
     beltRubber: new THREE.MeshStandardMaterial({color: '#1e2126', roughness: 0.84, metalness: 0.05}),
     ceramic: new THREE.MeshPhysicalMaterial({color: '#f3f0ea', roughness: 0.35, metalness: 0, clearcoat: 0.6}),
-    glass: new THREE.MeshPhysicalMaterial({color: '#6b7f94', roughness: 0.12, metalness: 0.05, clearcoat: 1.0, clearcoatRoughness: 0.08, transparent: true, opacity: 0.36, depthWrite: false, side: THREE.DoubleSide, envMapIntensity: 1.5}),
+    glass: new THREE.MeshPhysicalMaterial({color: '#4c6278', roughness: 0.1, metalness: 0.06, clearcoat: 1.0, clearcoatRoughness: 0.06, transparent: true, opacity: 0.31, depthWrite: false, side: THREE.DoubleSide, envMapIntensity: 1.6}),
     red: new THREE.MeshBasicMaterial({color: '#f26a3d', transparent: true, opacity: 0.9, depthWrite: false}),
   };
   if (lo) {
@@ -1861,13 +1861,10 @@ export function buildEngine(opts = {}) {
     if ('clearcoat' in m) m.clearcoat = 0;
     if ('envMapIntensity' in m) m.envMapIntensity = 0.1;
     if (m === M.glass || m === coverGlassMat) {
-      m.transparent = true;
       m.opacity = 0.42;
     } else if (m === plenumMat) {
-      m.transparent = true;
       m.opacity = 0.85;
     }
-    m.needsUpdate = true;
   };
   const applyCutMaterials = (mode) => {
     if (wireOn) return;
@@ -1962,7 +1959,6 @@ export function buildEngine(opts = {}) {
         m.transparent = s.transparent;
         m.opacity = s.opacity;
         if (s.envMapIntensity !== undefined) m.envMapIntensity = s.envMapIntensity;
-        m.needsUpdate = true;
       }
       wireSnap.clear();
       applyCutMaterials(cutNow);
@@ -2042,7 +2038,7 @@ export function buildEngine(opts = {}) {
         const ribIdx = bi % ribbonHelixCurves.length;
         const ribObj = ribbonHelixCurves[ribIdx];
         const u = (bi / PLENUM_BEADS + plenumRate + ribObj.phase) % 1;
-        ribObj.curve.getPointAt(u, beadPos);
+        ribObj.curve.getPoint(u, beadPos);
         beadDummy.position.copy(beadPos);
         const sBead = (0.75 + 0.45 * rpmLoad + 0.3 * boostBar) * (0.75 + 0.35 * Math.sin(u * Math.PI));
         beadDummy.scale.setScalar(sBead);
@@ -2140,7 +2136,7 @@ export function buildEngine(opts = {}) {
         const beadBoost = Math.max(inLift, ip);
         for (let rbi = 0; rbi < RUNNER_BEADS_EACH; rbi++) {
           const u = (rbi / RUNNER_BEADS_EACH + runnerRate + i * 0.13) % 1;
-          injObj.runnerCurve.getPointAt(u, beadPos);
+          injObj.runnerCurve.getPoint(u, beadPos);
           beadDummy.position.copy(beadPos);
           const sRunner = (0.52 + 0.78 * beadBoost + 0.25 * rpmLoad + 0.2 * boostBar) * (0.8 + 0.25 * Math.sin(u * Math.PI));
           beadDummy.scale.setScalar(sRunner);

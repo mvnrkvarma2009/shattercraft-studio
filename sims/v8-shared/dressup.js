@@ -185,11 +185,11 @@ export function createDressupMaterials(M, lo = false) {
     ? new THREE.MeshLambertMaterial({color: '#262220', flatShading: true})
     : new THREE.MeshStandardMaterial({color: '#262220', roughness: 0.42, metalness: 0.16});
   const billetTitanium = lo
-    ? new THREE.MeshLambertMaterial({color: '#585d66', flatShading: true})
-    : new THREE.MeshStandardMaterial({color: '#585d66', roughness: 0.26, metalness: 0.88});
+    ? new THREE.MeshLambertMaterial({color: '#4b525c', flatShading: true})
+    : new THREE.MeshStandardMaterial({color: '#4b525c', roughness: 0.24, metalness: 0.9});
   const satinAlloy = lo
-    ? new THREE.MeshLambertMaterial({color: '#8f959e', flatShading: true})
-    : new THREE.MeshStandardMaterial({color: '#8f959e', roughness: 0.28, metalness: 0.88});
+    ? new THREE.MeshLambertMaterial({color: '#9aa1ab', flatShading: true})
+    : new THREE.MeshStandardMaterial({color: '#9aa1ab', roughness: 0.24, metalness: 0.9});
   const materials = [filterBlue, dipstickYellow, copperWinding, rawTitanium, tigWeld, coralHub, coverComposite, billetTitanium, satinAlloy];
   return {filterBlue, dipstickYellow, copperWinding, rawTitanium, tigWeld, coralHub, coverComposite, billetTitanium, satinAlloy, materials};
 }
@@ -1194,13 +1194,13 @@ export function buildHybridValveCovers({M, DM, add, tag, N, plain, BANK, bankXY,
   const glassMat = plain
     ? M.glass
     : new THREE.MeshPhysicalMaterial({
-        color: '#6b7f94',
-        roughness: 0.1,
-        metalness: 0.05,
+        color: '#42586e',
+        roughness: 0.09,
+        metalness: 0.06,
         clearcoat: 1.0,
-        clearcoatRoughness: 0.08,
+        clearcoatRoughness: 0.06,
         transparent: true,
-        opacity: 0.34,
+        opacity: 0.3,
         depthWrite: false,
         side: THREE.DoubleSide,
       });
@@ -1247,7 +1247,7 @@ export function buildHybridValveCovers({M, DM, add, tag, N, plain, BANK, bankXY,
     const gasket = add(bg, gasketGeo, M.beltRubber);
     gasket.position.y = DECK + 42;
 
-    const skirt = add(bg, skirtFlangeGeo, M.alu);
+    const skirt = add(bg, skirtFlangeGeo, DM.satinAlloy || M.alu);
     skirt.position.y = DECK + 46;
 
     const rail = add(bg, upperRailGeo, glassMat, false);
@@ -1255,12 +1255,12 @@ export function buildHybridValveCovers({M, DM, add, tag, N, plain, BANK, bankXY,
     rail.renderOrder = 4;
     glassWindows.push(rail);
 
-    const bezel = add(bg, bezelFrameGeo, M.alu);
+    const bezel = add(bg, bezelFrameGeo, DM.satinAlloy || M.alu);
     bezel.position.y = DECK + 158;
 
     // Semicircular cam-end reliefs at front/rear (cam shaft axis at y = DECK + 112)
     for (const ez of [-222, 222]) {
-      const relief = add(bg, new THREE.CylinderGeometry(19, 19, 10, N(18), 1, false, -Math.PI / 2, Math.PI), M.alu);
+      const relief = add(bg, new THREE.CylinderGeometry(19, 19, 10, N(18), 1, false, -Math.PI / 2, Math.PI), DM.satinAlloy || M.alu);
       relief.rotation.x = -Math.PI / 2;
       relief.position.set(0, DECK + 112, ez + Math.sign(ez) * 2);
       const trim = add(bg, new THREE.TorusGeometry(19, 2.2, N(6, 4), N(16), Math.PI), M.gunmetal);
@@ -1277,13 +1277,13 @@ export function buildHybridValveCovers({M, DM, add, tag, N, plain, BANK, bankXY,
     for (const sgn of [-1, 1]) {
       const strip = add(bg, new THREE.BoxGeometry(3.8, 3.2, 412), M.steel);
       strip.position.set(sgn * 56.5, DECK + 159, 0);
-      const shoulderBevel = add(bg, new THREE.BoxGeometry(7.5, 5, 424), M.alu);
+      const shoulderBevel = add(bg, new THREE.BoxGeometry(7.5, 5, 424), DM.satinAlloy || M.alu);
       shoulderBevel.position.set(sgn * 52, DECK + 154, 0);
       shoulderBevel.rotation.z = -sgn * 0.45;
       const innerBead = add(bg, new THREE.BoxGeometry(2.6, 2.5, 402), M.chrome);
       innerBead.position.set(sgn * 41.2, DECK + 165.8, 0);
       for (const pz of [-210, 210]) {
-        const pillar = add(bg, new THREE.BoxGeometry(6, 107, 6), M.alu);
+        const pillar = add(bg, new THREE.BoxGeometry(6, 107, 6), DM.billetTitanium || M.gunmetal);
         pillar.position.set(sgn * 51.5, DECK + 105.5, pz);
       }
     }
