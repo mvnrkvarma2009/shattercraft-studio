@@ -5,8 +5,8 @@
 // timing gears, articulated roller-rockers + crimson coil-on-plug packs, cross-plane crank, machined flywheel,
 // ribbed oil sump, and solid-capped section cuts.
 import * as THREE from 'three';
-import {buildAccessoryDressup, buildHybridValveCovers, buildSumpAndBlockDressup, createDressupMaterials} from './dressup.js';
-import {BANK, bankXY, chargeOf, CYL, E, exhaustPulse, FIRE, injectorPulse, liftEx, liftIn, piston, pinXY, psi, PIN_PHASE, pressure, rockerAngle, sparkIntensity, VALVE} from './kin.js';
+import { buildAccessoryDressup, buildHybridValveCovers, buildSumpAndBlockDressup, createDressupMaterials } from './dressup.js';
+import { BANK, bankXY, chargeOf, CYL, E, exhaustPulse, FIRE, injectorPulse, liftEx, liftIn, piston, pinXY, psi, PIN_PHASE, pressure, rockerAngle, sparkIntensity, VALVE } from './kin.js';
 
 const V3 = THREE.Vector3;
 const D2R = Math.PI / 180;
@@ -37,7 +37,7 @@ function gearGeo(teeth, rOut, rRoot, width, helix = 0, holeR = 0) {
     h.absarc(0, 0, holeR, 0, Math.PI * 2, true);
     sh.holes.push(h);
   }
-  const g = new THREE.ExtrudeGeometry(sh, {depth: width, bevelEnabled: true, bevelThickness: 1.2, bevelSize: 1.0, bevelSegments: 1, curveSegments: 4});
+  const g = new THREE.ExtrudeGeometry(sh, { depth: width, bevelEnabled: true, bevelThickness: 1.2, bevelSize: 1.0, bevelSegments: 1, curveSegments: 4 });
   g.translate(0, 0, -width / 2);
   if (helix) {
     const p = g.attributes.position;
@@ -60,7 +60,7 @@ function discGeo(r, width, holeR = 0, seg = 48) {
     h.absarc(0, 0, holeR, 0, Math.PI * 2, true);
     sh.holes.push(h);
   }
-  const g = new THREE.ExtrudeGeometry(sh, {depth: width, bevelEnabled: true, bevelThickness: 1.2, bevelSize: 1.0, bevelSegments: 1, curveSegments: seg});
+  const g = new THREE.ExtrudeGeometry(sh, { depth: width, bevelEnabled: true, bevelThickness: 1.2, bevelSize: 1.0, bevelSegments: 1, curveSegments: seg });
   g.translate(0, 0, -width / 2);
   return g;
 }
@@ -83,7 +83,7 @@ function webGeo(thick, cs = 28) {
   sh.absarc(0, E.r, 31, 0, Math.PI, false);
   sh.lineTo(-30, 10);
   sh.closePath();
-  const g = new THREE.ExtrudeGeometry(sh, {depth: thick, bevelEnabled: true, bevelThickness: 2.4, bevelSize: 2.2, bevelSegments: 2, curveSegments: cs});
+  const g = new THREE.ExtrudeGeometry(sh, { depth: thick, bevelEnabled: true, bevelThickness: 2.4, bevelSize: 2.2, bevelSegments: 2, curveSegments: cs });
   g.translate(0, 0, -thick / 2);
   return g;
 }
@@ -101,7 +101,7 @@ function bulkheadGeo(thick, cs = 24) {
   const hole = new THREE.Path();
   hole.absarc(0, 0, 44, 0, Math.PI * 2, true);
   sh.holes.push(hole);
-  const g = new THREE.ExtrudeGeometry(sh, {depth: thick, bevelEnabled: true, bevelThickness: 2, bevelSize: 2, bevelSegments: 2, curveSegments: cs});
+  const g = new THREE.ExtrudeGeometry(sh, { depth: thick, bevelEnabled: true, bevelThickness: 2, bevelSize: 2, bevelSegments: 2, curveSegments: cs });
   g.translate(0, 0, -thick / 2);
   return g;
 }
@@ -114,12 +114,12 @@ function makeChargeMaterial() {
     side: THREE.DoubleSide,
     clipping: true,
     uniforms: {
-      uColor: {value: new THREE.Color('#3f8de0')},
-      uOpacity: {value: 0.35},
-      uSpark: {value: 0},
-      uSwirl: {value: 0},
-      uStroke: {value: 0},
-      uBeat: {value: 0},
+      uColor: { value: new THREE.Color('#3f8de0') },
+      uOpacity: { value: 0.35 },
+      uSpark: { value: 0 },
+      uSwirl: { value: 0 },
+      uStroke: { value: 0 },
+      uBeat: { value: 0 },
     },
     vertexShader: /* glsl */ `
       #include <common>
@@ -193,11 +193,11 @@ function makeCollectorFlameMaterial(isCore) {
     side: THREE.DoubleSide,
     clipping: true,
     uniforms: {
-      uPulse: {value: 0},
-      uBeat: {value: 0},
-      uSwirl: {value: 0},
-      uOpacity: {value: 0},
-      uIsCore: {value: isCore ? 1.0 : 0.0},
+      uPulse: { value: 0 },
+      uBeat: { value: 0 },
+      uSwirl: { value: 0 },
+      uOpacity: { value: 0 },
+      uIsCore: { value: isCore ? 1.0 : 0.0 },
     },
     vertexShader: /* glsl */ `
       #include <common>
@@ -268,8 +268,8 @@ function makeXrayMaterial() {
     side: THREE.FrontSide,
     clipping: true,
     uniforms: {
-      uColor: {value: new THREE.Color('#5eb8f2')},
-      uRimColor: {value: new THREE.Color('#2d86d6')},
+      uColor: { value: new THREE.Color('#5eb8f2') },
+      uRimColor: { value: new THREE.Color('#2d86d6') },
     },
     vertexShader: /* glsl */ `
       #include <common>
@@ -313,13 +313,13 @@ function makeStreamMaterial(colA, colB, freq = 18.0, alongU = false) {
     side: THREE.DoubleSide,
     clipping: true,
     uniforms: {
-      uFlow: {value: 0},
-      uBeat: {value: 0},
-      uOpacity: {value: 0.75},
-      uColA: {value: new THREE.Color(colA)},
-      uColB: {value: new THREE.Color(colB)},
-      uFreq: {value: freq},
-      uAlongU: {value: alongU ? 1.0 : 0.0},
+      uFlow: { value: 0 },
+      uBeat: { value: 0 },
+      uOpacity: { value: 0.75 },
+      uColA: { value: new THREE.Color(colA) },
+      uColB: { value: new THREE.Color(colB) },
+      uFreq: { value: freq },
+      uAlongU: { value: alongU ? 1.0 : 0.0 },
     },
     vertexShader: /* glsl */ `
       #include <common>
@@ -374,21 +374,21 @@ export function buildEngine(opts = {}) {
     plain ? discGeo((rOut + rRoot) / 2, width, holeR, lo ? Math.max(8, Math.round((rOut + rRoot) / 24)) : 48) : gearGeo(teeth, rOut, rRoot, width, helix, holeR);
   const root = new THREE.Group();
   const M = {
-    black: new THREE.MeshPhysicalMaterial({color: '#191b20', roughness: 0.28, metalness: 0.24, clearcoat: 0.72, clearcoatRoughness: 0.16}),
-    blackMatte: new THREE.MeshPhysicalMaterial({color: '#22242a', roughness: 0.48, metalness: 0.22, clearcoat: 0.28}),
-    gunmetal: new THREE.MeshStandardMaterial({color: '#464d57', roughness: 0.3, metalness: 0.86}),
-    steel: new THREE.MeshStandardMaterial({color: '#b8bec7', roughness: 0.2, metalness: 0.96}),
-    chrome: new THREE.MeshStandardMaterial({color: '#e5e9ef', roughness: 0.12, metalness: 1}),
-    alu: new THREE.MeshStandardMaterial({color: '#a3aab4', roughness: 0.27, metalness: 0.9}),
-    bronze: new THREE.MeshStandardMaterial({color: '#b98a55', roughness: 0.28, metalness: 0.92}),
-    crimson: new THREE.MeshPhysicalMaterial({color: '#f26a3d', roughness: 0.3, metalness: 0.22, clearcoat: 0.4}),
-    beltRubber: new THREE.MeshStandardMaterial({color: '#1e2126', roughness: 0.84, metalness: 0.05}),
-    ceramic: new THREE.MeshPhysicalMaterial({color: '#f3f0ea', roughness: 0.35, metalness: 0, clearcoat: 0.6}),
-    glass: new THREE.MeshPhysicalMaterial({color: '#4c6278', roughness: 0.1, metalness: 0.06, clearcoat: 1.0, clearcoatRoughness: 0.06, transparent: true, opacity: 0.31, depthWrite: false, side: THREE.DoubleSide, envMapIntensity: 1.6}),
-    red: new THREE.MeshBasicMaterial({color: '#f26a3d', transparent: true, opacity: 0.9, depthWrite: false}),
+    black: new THREE.MeshPhysicalMaterial({ color: '#191b20', roughness: 0.28, metalness: 0.24, clearcoat: 0.72, clearcoatRoughness: 0.16 }),
+    blackMatte: new THREE.MeshPhysicalMaterial({ color: '#22242a', roughness: 0.48, metalness: 0.22, clearcoat: 0.28 }),
+    gunmetal: new THREE.MeshStandardMaterial({ color: '#464d57', roughness: 0.3, metalness: 0.86 }),
+    steel: new THREE.MeshStandardMaterial({ color: '#b8bec7', roughness: 0.2, metalness: 0.96 }),
+    chrome: new THREE.MeshStandardMaterial({ color: '#e5e9ef', roughness: 0.12, metalness: 1 }),
+    alu: new THREE.MeshStandardMaterial({ color: '#a3aab4', roughness: 0.27, metalness: 0.9 }),
+    bronze: new THREE.MeshStandardMaterial({ color: '#b98a55', roughness: 0.28, metalness: 0.92 }),
+    crimson: new THREE.MeshPhysicalMaterial({ color: '#f26a3d', roughness: 0.3, metalness: 0.22, clearcoat: 0.4 }),
+    beltRubber: new THREE.MeshStandardMaterial({ color: '#1e2126', roughness: 0.84, metalness: 0.05 }),
+    ceramic: new THREE.MeshPhysicalMaterial({ color: '#f3f0ea', roughness: 0.35, metalness: 0, clearcoat: 0.6 }),
+    glass: new THREE.MeshPhysicalMaterial({ color: '#4c6278', roughness: 0.1, metalness: 0.06, clearcoat: 1.0, clearcoatRoughness: 0.06, transparent: true, opacity: 0.31, depthWrite: false, side: THREE.DoubleSide, envMapIntensity: 1.6 }),
+    red: new THREE.MeshBasicMaterial({ color: '#f26a3d', transparent: true, opacity: 0.9, depthWrite: false }),
   };
   if (lo) {
-    const flat = (color) => new THREE.MeshLambertMaterial({color, flatShading: true});
+    const flat = (color) => new THREE.MeshLambertMaterial({ color, flatShading: true });
     Object.assign(M, {
       black: flat('#66696f'),
       blackMatte: flat('#717479'),
@@ -436,7 +436,7 @@ export function buildEngine(opts = {}) {
   for (const z of [236, 112, 0, -112, -236]) {
     const bhm = add(block, bh, M.alu);
     bhm.position.z = z;
-    tag(bhm, {name: 'Crankcase Bulkhead', subsystem: 'Engine Block', material: 'Cast A356 Aluminum Alloy', spec: '90° V-block rib, 16 mm thick, Ø88 mm main bore & steel cap'}, [0, 0, 0]);
+    tag(bhm, { name: 'Crankcase Bulkhead', subsystem: 'Engine Block', material: 'Cast A356 Aluminum Alloy', spec: '90° V-block rib, 16 mm thick, Ø88 mm main bore & steel cap' }, [0, 0, 0]);
     const mainCap = add(block, new THREE.BoxGeometry(118, 22, 20), M.gunmetal);
     mainCap.position.set(0, -58, z);
   }
@@ -454,22 +454,22 @@ export function buildEngine(opts = {}) {
       const [x, y] = [(DECK - 18) * B.b[0] + w * B.p[0], (DECK - 18) * B.b[1] + w * B.p[1]];
       r.position.set(x, y, 0);
       r.rotation.z = bankRot;
-      tag(r, {name: `Deck Stiffener Rail (${bank} Bank)`, subsystem: 'Engine Block', material: 'Cast Aluminum Alloy', spec: '14 × 16 × 488 mm cylinder deck rail'}, [B.b[0] * 40, B.b[1] * 40, 0]);
+      tag(r, { name: `Deck Stiffener Rail (${bank} Bank)`, subsystem: 'Engine Block', material: 'Cast Aluminum Alloy', spec: '14 × 16 × 488 mm cylinder deck rail' }, [B.b[0] * 40, B.b[1] * 40, 0]);
     }
     const jacket = add(solidWallGrp, new THREE.BoxGeometry(12, 114, 472), M.alu);
     jacket.position.set(152 * B.b[0] + sgn * 56 * B.p[0], 152 * B.b[1] + sgn * 56 * B.p[1], 0);
     jacket.rotation.z = bankRot;
-    tag(jacket, {name: `Cylinder Bank Skirt Wall (${bank} Bank)`, subsystem: 'Engine Block', material: 'Die-Cast A356 Aluminum', spec: 'Solid structural water-jacket cylinder bank wall'}, [B.b[0] * 40, B.b[1] * 40, 0]);
+    tag(jacket, { name: `Cylinder Bank Skirt Wall (${bank} Bank)`, subsystem: 'Engine Block', material: 'Die-Cast A356 Aluminum', spec: 'Solid structural water-jacket cylinder bank wall' }, [B.b[0] * 40, B.b[1] * 40, 0]);
     const flank = add(solidWallGrp, new THREE.BoxGeometry(14, 68, 472), M.alu);
     flank.position.set(sgn * 108, 6, 0);
     flank.rotation.z = -sgn * 0.22;
-    tag(flank, {name: `Crankcase Flank Wall (${bank} Bank)`, subsystem: 'Engine Block', material: 'Die-Cast A356 Aluminum', spec: 'Structural crankcase side skirt above freeze-plug gallery'});
+    tag(flank, { name: `Crankcase Flank Wall (${bank} Bank)`, subsystem: 'Engine Block', material: 'Die-Cast A356 Aluminum', spec: 'Structural crankcase side skirt above freeze-plug gallery' });
   }
   const valleyCover = add(solidWallGrp, new THREE.BoxGeometry(122, 10, 472), M.gunmetal);
   valleyCover.position.set(0, 134, 0);
-  tag(valleyCover, {name: 'V-Valley Cover Plate', subsystem: 'Engine Block', material: 'Machined Gunmetal Billet', spec: '10 mm structural valley tray sealing lifter/crank gallery'});
-  const sumpRes = buildSumpAndBlockDressup({M, DM, add, tag, ignore, N, plain, BANK, DECK, CYL});
-  const {sumpGrp, blockDressGrp, sparkLeadsGrp, harnessGrp} = sumpRes;
+  tag(valleyCover, { name: 'V-Valley Cover Plate', subsystem: 'Engine Block', material: 'Machined Gunmetal Billet', spec: '10 mm structural valley tray sealing lifter/crank gallery' });
+  const sumpRes = buildSumpAndBlockDressup({ M, DM, add, tag, ignore, N, plain, BANK, DECK, CYL });
+  const { sumpGrp, blockDressGrp, sparkLeadsGrp, harnessGrp } = sumpRes;
   block.add(sumpGrp);
   block.add(blockDressGrp);
   for (const g of [sparkLeadsGrp, harnessGrp]) {
@@ -482,10 +482,10 @@ export function buildEngine(opts = {}) {
   if (sumpGrp.pickupGrp) xrayKeep(sumpGrp.pickupGrp);
   const rail = add(block, new THREE.BoxGeometry(220, 12, 500), M.gunmetal);
   rail.position.set(0, -68, 0);
-  tag(rail, {name: 'Lower Block Skirt Rail', subsystem: 'Engine Block', material: 'Machined Alloy Skirt Rail', spec: '220 × 12 × 500 mm pan mounting flange'}, [0, -190, 0]);
+  tag(rail, { name: 'Lower Block Skirt Rail', subsystem: 'Engine Block', material: 'Machined Alloy Skirt Rail', spec: '220 × 12 × 500 mm pan mounting flange' }, [0, -190, 0]);
 
   // ------------------------------------------------------------ cylinders: liner, head, valvetrain, plug, exhaust
-  const sparkMatBase = new THREE.MeshBasicMaterial({color: '#ff8c24', transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide});
+  const sparkMatBase = new THREE.MeshBasicMaterial({ color: '#ff8c24', transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide });
   const exTubeMat = M.gunmetal.clone();
   const EX_COL_COOL = new THREE.Color('#c2bbb0');
   const EX_COL_WARM = new THREE.Color('#cc7e4e');
@@ -506,16 +506,16 @@ export function buildEngine(opts = {}) {
     const liner = add(g, new THREE.CylinderGeometry(E.bore / 2 + 3, E.bore / 2 + 3, 118, N(48), 1, true), M.glass, false);
     liner.position.y = DECK - 59;
     liner.renderOrder = 3;
-    tag(liner, {name: `Cylinder ${cy.c} Liner`, subsystem: bankLabel, material: 'Borosilicate / Honed Sleeve', spec: `Ø${E.bore} mm bore × 118 mm optical sleeve`}, [0, 70, 0]);
+    tag(liner, { name: `Cylinder ${cy.c} Liner`, subsystem: bankLabel, material: 'Borosilicate / Honed Sleeve', spec: `Ø${E.bore} mm bore × 118 mm optical sleeve` }, [0, 70, 0]);
     for (const y of [DECK - 118, DECK]) {
       const ring = add(g, new THREE.TorusGeometry(E.bore / 2 + 4, 3.2, N(10, 4), N(48)), M.black);
       ring.rotation.x = Math.PI / 2;
       ring.position.y = y;
-      tag(ring, {name: `Cylinder ${cy.c} Liner Ring`, subsystem: bankLabel, material: 'Nitrided Steel', spec: `Ø${E.bore + 8} mm deck/base locating ring`}, [0, 70, 0]);
+      tag(ring, { name: `Cylinder ${cy.c} Liner Ring`, subsystem: bankLabel, material: 'Nitrided Steel', spec: `Ø${E.bore + 8} mm deck/base locating ring` }, [0, 70, 0]);
     }
     const head = new THREE.Group();
     g.add(head);
-    tag(head, {name: `Cylinder ${cy.c} Head`, subsystem: `Cylinder Heads · ${bankLabel}`, material: 'Cast Aluminum Alloy', spec: `CR ${E.cr}:1 pent-roof chamber, 2-valve, perimeter head bolts`}, [0, 200, 0]);
+    tag(head, { name: `Cylinder ${cy.c} Head`, subsystem: `Cylinder Heads · ${bankLabel}`, material: 'Cast Aluminum Alloy', spec: `CR ${E.cr}:1 pent-roof chamber, 2-valve, perimeter head bolts` }, [0, 200, 0]);
     const flange = add(head, new THREE.TorusGeometry(62, 7.5, N(16, 4), N(56)), M.black);
     flange.rotation.x = Math.PI / 2;
     flange.position.y = DECK + 8;
@@ -537,7 +537,7 @@ export function buildEngine(opts = {}) {
 
     // volumetric GLSL charge column (simple basic material in lo build)
     const chargeMat = lo
-      ? new THREE.MeshBasicMaterial({color: '#4a90e2', transparent: true, opacity: 0.35, depthWrite: false})
+      ? new THREE.MeshBasicMaterial({ color: '#4a90e2', transparent: true, opacity: 0.35, depthWrite: false })
       : makeChargeMaterial();
     const charge = new THREE.Mesh(new THREE.CylinderGeometry(E.bore / 2 - 1, E.bore / 2 - 1, 1, N(40), 8), chargeMat);
     charge.renderOrder = 2;
@@ -546,8 +546,8 @@ export function buildEngine(opts = {}) {
 
     // valves: intake on the valley side, exhaust outboard
     const valves = [
-      {x: -out * 21, kind: 'in'},
-      {x: out * 21, kind: 'ex'},
+      { x: -out * 21, kind: 'in' },
+      { x: out * 21, kind: 'ex' },
     ].map((v) => {
       const vg = new THREE.Group();
       xrayKeep(vg);
@@ -585,13 +585,13 @@ export function buildEngine(opts = {}) {
       }
       const ret = add(vg, new THREE.CylinderGeometry(18, 18, 4, N(24)), M.black);
       ret.position.y = DECK + 84;
-      return {...v, vg, spring, rocker: null};
+      return { ...v, vg, spring, rocker: null };
     });
 
     // rocker cage + steel fulcrum shafts + articulated roller-rocker arms
     const cage = new THREE.Group();
     g.add(cage);
-    tag(cage, {name: `Cyl ${cy.c} Valve Cover / Rocker Cage`, subsystem: `Valvetrain · ${bankLabel}`, material: 'Machined Billet Aluminum', spec: 'Open inspection frame, twin fulcrum shafts'}, [0, 390, 0]);
+    tag(cage, { name: `Cyl ${cy.c} Valve Cover / Rocker Cage`, subsystem: `Valvetrain · ${bankLabel}`, material: 'Machined Billet Aluminum', spec: 'Open inspection frame, twin fulcrum shafts' }, [0, 390, 0]);
     for (const zz of [-30, 30]) {
       for (const xx of [-44, 44]) {
         const post = add(cage, new THREE.BoxGeometry(6, 110, 6), M.black);
@@ -609,7 +609,7 @@ export function buildEngine(opts = {}) {
       const shaft = add(cage, new THREE.CylinderGeometry(4, 4, 66, N(14)), M.steel);
       shaft.rotation.x = Math.PI / 2;
       shaft.position.set(fx, fy, 0);
-      tag(shaft, {name: `Cyl ${cy.c} Rocker Fulcrum Shaft`, subsystem: `Valvetrain · ${bankLabel}`, material: 'Hardened Bearing Steel', spec: 'Ø8 × 66 mm rocker pivot shaft'});
+      tag(shaft, { name: `Cyl ${cy.c} Rocker Fulcrum Shaft`, subsystem: `Valvetrain · ${bankLabel}`, material: 'Hardened Bearing Steel', spec: 'Ø8 × 66 mm rocker pivot shaft' });
       // articulated roller-rocker group pivoting around (fx, fy, 0)
       const rocker = new THREE.Group();
       rocker.position.set(fx, fy, 0);
@@ -648,7 +648,7 @@ export function buildEngine(opts = {}) {
     head.add(plug);
     plug.position.set(out * 46, DECK + 18, 18);
     plug.rotation.z = -out * 0.62;
-    tag(plug, {name: `Cyl ${cy.c} Spark Plug & Ignition Coil`, subsystem: `Ignition · ${bankLabel}`, material: 'Alumina Ceramic / Crimson Coil-on-Plug', spec: `M14 iridium plug + coil pack firing at ${FIRE[cy.c]}° crank`}, [out * 36, 36, 0]);
+    tag(plug, { name: `Cyl ${cy.c} Spark Plug & Ignition Coil`, subsystem: `Ignition · ${bankLabel}`, material: 'Alumina Ceramic / Crimson Coil-on-Plug', spec: `M14 iridium plug + coil pack firing at ${FIRE[cy.c]}° crank` }, [out * 36, 36, 0]);
     add(plug, new THREE.CylinderGeometry(6.5, 6.5, 40, N(16)), M.ceramic).position.y = 30;
     add(plug, new THREE.CylinderGeometry(8.5, 8.5, 10, 6), M.steel).position.y = 6;
     add(plug, new THREE.CylinderGeometry(2.2, 2.2, 10, N(8, 4)), M.steel).position.y = 55;
@@ -657,8 +657,8 @@ export function buildEngine(opts = {}) {
     // ground strap + center electrode tip + glowing TDC spark arc inside optical combustion dome
     add(plug, new THREE.CylinderGeometry(1.6, 1.6, 18, N(8, 4)), M.steel).position.y = -8;
     const sparkMat = sparkMatBase.clone();
-    const sparkCoreMat = new THREE.MeshBasicMaterial({color: '#fff9e0', transparent: true, opacity: 0, depthWrite: false});
-    const sparkGlowMat = new THREE.MeshBasicMaterial({color: '#ff5514', transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide});
+    const sparkCoreMat = new THREE.MeshBasicMaterial({ color: '#fff9e0', transparent: true, opacity: 0, depthWrite: false });
+    const sparkGlowMat = new THREE.MeshBasicMaterial({ color: '#ff5514', transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide });
     const sparkArc = new THREE.Group();
     sparkArc.position.set(0, -28, 0);
     const core = new THREE.Mesh(new THREE.OctahedronGeometry(7.5, 0), sparkCoreMat);
@@ -676,14 +676,14 @@ export function buildEngine(opts = {}) {
     const exFlangeGrp = new THREE.Group();
     exFlangeGrp.position.set(out * 49, DECK + 12, -20);
     head.add(exFlangeGrp);
-    tag(exFlangeGrp, {name: `Cyl ${cy.c} Exhaust Port Flange`, subsystem: `Exhaust · ${bankLabel}`, material: 'CNC 304 Stainless Flange / Silicon Bronze Seal', spec: '2-bolt diamond port flange with M8 header bolts'});
+    tag(exFlangeGrp, { name: `Cyl ${cy.c} Exhaust Port Flange`, subsystem: `Exhaust · ${bankLabel}`, material: 'CNC 304 Stainless Flange / Silicon Bronze Seal', spec: '2-bolt diamond port flange with M8 header bolts' });
     const fSh = new THREE.Shape();
     fSh.moveTo(0, -34);
     fSh.quadraticCurveTo(18, -14, 20, 0);
     fSh.quadraticCurveTo(18, 14, 0, 34);
     fSh.quadraticCurveTo(-18, 14, -20, 0);
     fSh.quadraticCurveTo(-18, -14, 0, -34);
-    const fGeo = new THREE.ExtrudeGeometry(fSh, {depth: 7, bevelEnabled: true, bevelThickness: 1, bevelSize: 1, bevelSegments: 1, curveSegments: 8});
+    const fGeo = new THREE.ExtrudeGeometry(fSh, { depth: 7, bevelEnabled: true, bevelThickness: 1, bevelSize: 1, bevelSegments: 1, curveSegments: 8 });
     fGeo.translate(0, 0, -3.5);
     const exFlange = add(exFlangeGrp, fGeo, M.alu);
     exFlange.rotation.y = Math.PI / 2;
@@ -706,8 +706,8 @@ export function buildEngine(opts = {}) {
       localOf(out * 216 + clusterOffX * 0.8, -26 + clusterOffY * 0.8, -196),
     ];
     const exhaust = add(head, new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), N(34), 14.5, N(18), false), exTubeMat);
-    tag(exhaust, {name: `Cyl ${cy.c} Exhaust Header Primary`, subsystem: `Exhaust · ${bankLabel}`, material: 'Brushed Heat-Cycled Inconel 625', spec: 'Equal-length primary terminating cleanly in 4-into-1 merge housing'}, [out * 95, 10, 0]);
-    return {cy, g, out, charge, chargeMat, valves, liner, head, cage, sparkArc, sparkMat, sparkCoreMat, sparkGlowMat};
+    tag(exhaust, { name: `Cyl ${cy.c} Exhaust Header Primary`, subsystem: `Exhaust · ${bankLabel}`, material: 'Brushed Heat-Cycled Inconel 625', spec: 'Equal-length primary terminating cleanly in 4-into-1 merge housing' }, [out * 95, 10, 0]);
+    return { cy, g, out, charge, chargeMat, valves, liner, head, cage, sparkArc, sparkMat, sparkCoreMat, sparkGlowMat };
   });
 
   // camshafts: one per bank through the cages, polished steel lobes phased to bank orientation
@@ -737,38 +737,38 @@ export function buildEngine(opts = {}) {
         g.add(lg);
         const sh = new THREE.Shape();
         sh.absellipse(0, 3.2, 14, 17.2, 0, Math.PI * 2, false, 0);
-        const lobeGeo = lo ? new THREE.BoxGeometry(28, 34, 14).translate(0, 3.2, 7) : new THREE.ExtrudeGeometry(sh, {depth: 14, bevelEnabled: true, bevelSize: 1, bevelThickness: 1, bevelSegments: 1, curveSegments: 24});
+        const lobeGeo = lo ? new THREE.BoxGeometry(28, 34, 14).translate(0, 3.2, 7) : new THREE.ExtrudeGeometry(sh, { depth: 14, bevelEnabled: true, bevelSize: 1, bevelThickness: 1, bevelSegments: 1, curveSegments: 24 });
         const lobe = add(lg, lobeGeo, M.steel);
         lobe.position.z = -7;
-        lobes.push({lg, c, v});
+        lobes.push({ lg, c, v });
       }
     }
-    return {bank, g, lobes};
+    return { bank, g, lobes };
   });
 
   // Hybrid Windowed / Swappable Solid-Finned Valve Covers (L & R banks)
-  const {coversGrp, leftGrp: leftCoverGrp, rightGrp: rightCoverGrp, glassWindows, solidLids} = buildHybridValveCovers({M, DM, add, tag, N, plain, BANK, bankXY, DECK});
+  const { coversGrp, leftGrp: leftCoverGrp, rightGrp: rightCoverGrp, glassWindows, solidLids } = buildHybridValveCovers({ M, DM, add, tag, N, plain, BANK, bankXY, DECK });
   root.add(coversGrp);
 
   // ------------------------------------------------------------ crankshaft with oil-drilled journals
   const crank = new THREE.Group();
   root.add(crank);
-  tag(crank, {name: 'Cross-Plane Crankshaft', subsystem: 'Rotating Assembly', material: 'Forged 4340 Chromoly Steel', spec: '90° cross-plane, 44.5 mm throw (89 mm stroke)'}, [0, -110, 0]);
+  tag(crank, { name: 'Cross-Plane Crankshaft', subsystem: 'Rotating Assembly', material: 'Forged 4340 Chromoly Steel', spec: '90° cross-plane, 44.5 mm throw (89 mm stroke)' }, [0, -110, 0]);
   const webG = webGeo(18, N(28));
   const webs = [];
   E.pinZ.forEach((z, p) => {
     for (const dz of [-34, 34]) {
       const w = add(crank, webG, M.black);
       w.position.z = z + dz;
-      tag(w, {name: `Crankshaft Counterweight Web (Throw ${p + 1})`, subsystem: 'Rotating Assembly', material: 'Forged 4340 Chromoly Steel', spec: `R76 mm chamfered counterweight, ${PIN_PHASE[p]}° phase`});
-      webs.push({w, p});
+      tag(w, { name: `Crankshaft Counterweight Web (Throw ${p + 1})`, subsystem: 'Rotating Assembly', material: 'Forged 4340 Chromoly Steel', spec: `R76 mm chamfered counterweight, ${PIN_PHASE[p]}° phase` });
+      webs.push({ w, p });
     }
   });
   const journals = [236, 112, 0, -112, -236].map((z, idx) => {
     const jg = new THREE.Group();
     jg.position.z = z;
     crank.add(jg);
-    tag(jg, {name: `Crankshaft Main Journal #${idx + 1}`, subsystem: 'Rotating Assembly', material: 'Induction-Hardened 4340 Steel', spec: 'Ø60 × 42 mm oil-drilled main journal'});
+    tag(jg, { name: `Crankshaft Main Journal #${idx + 1}`, subsystem: 'Rotating Assembly', material: 'Induction-Hardened 4340 Steel', spec: 'Ø60 × 42 mm oil-drilled main journal' });
     add(jg, new THREE.CylinderGeometry(30, 30, 42, N(32)), M.steel).rotation.x = Math.PI / 2;
     const oilPort = add(jg, new THREE.CylinderGeometry(3.2, 3.2, 62, N(10)), M.blackMatte);
     oilPort.rotation.z = idx % 2 ? 0.6 : -0.6;
@@ -778,7 +778,7 @@ export function buildEngine(opts = {}) {
     const pg = new THREE.Group();
     pg.position.z = z;
     root.add(pg);
-    tag(pg, {name: `Crankpin Throw ${p + 1} (Cyl ${p * 2 + 1}·${p * 2 + 2})`, subsystem: 'Rotating Assembly', material: 'Induction-Hardened 4340 Steel', spec: `Ø50 × 52 mm oil-drilled rod journal, ${PIN_PHASE[p]}°`}, [0, -110, 0]);
+    tag(pg, { name: `Crankpin Throw ${p + 1} (Cyl ${p * 2 + 1}·${p * 2 + 2})`, subsystem: 'Rotating Assembly', material: 'Induction-Hardened 4340 Steel', spec: `Ø50 × 52 mm oil-drilled rod journal, ${PIN_PHASE[p]}°` }, [0, -110, 0]);
     add(pg, new THREE.CylinderGeometry(25, 25, 52, N(28)), M.steel).rotation.x = Math.PI / 2;
     const port = add(pg, new THREE.CylinderGeometry(2.8, 2.8, 52, N(10)), M.blackMatte);
     port.rotation.z = (PIN_PHASE[p] * D2R);
@@ -793,7 +793,7 @@ export function buildEngine(opts = {}) {
     const bankLabel = cy.bank === 'L' ? 'Left Bank' : 'Right Bank';
     const g = new THREE.Group();
     cyl[i].g.add(g);
-    tag(g, {name: `Cylinder ${cy.c} Piston`, subsystem: `Reciprocating · ${bankLabel}`, material: 'Forged 4032 Aluminum Alloy', spec: `Ø${(E.bore - 3).toFixed(1)} mm valve-relieved crown, 3 rings`}, [0, 110, 0]);
+    tag(g, { name: `Cylinder ${cy.c} Piston`, subsystem: `Reciprocating · ${bankLabel}`, material: 'Forged 4032 Aluminum Alloy', spec: `Ø${(E.bore - 3).toFixed(1)} mm valve-relieved crown, 3 rings` }, [0, 110, 0]);
     const body = add(g, pistonGeo, M.alu);
     body.position.y = E.comp - 31;
     // crown valve-relief pockets + wrist-pin boss reliefs
@@ -817,11 +817,11 @@ export function buildEngine(opts = {}) {
     const pinM = add(g, new THREE.CylinderGeometry(11, 11, E.bore - 10, N(16)), M.steel);
     pinM.rotation.z = Math.PI / 2;
     pinM.rotation.y = Math.PI / 2;
-    tag(pinM, {name: `Cyl ${cy.c} Wrist Pin`, subsystem: `Reciprocating · ${bankLabel}`, material: 'Case-Hardened Chromoly Steel', spec: `Ø22 × ${(E.bore - 10).toFixed(1)} mm full-floating gudgeon pin`});
+    tag(pinM, { name: `Cyl ${cy.c} Wrist Pin`, subsystem: `Reciprocating · ${bankLabel}`, material: 'Case-Hardened Chromoly Steel', spec: `Ø22 × ${(E.bore - 10).toFixed(1)} mm full-floating gudgeon pin` });
 
     const rod = new THREE.Group();
     root.add(rod);
-    tag(rod, {name: `Cylinder ${cy.c} H-Beam Connecting Rod`, subsystem: `Reciprocating · ${bankLabel}`, material: 'Forged H-Beam 4340 Steel', spec: `${E.rod} mm C-to-C, split big-end cap & twin bolts`}, [110 * B.b[0], 110 * B.b[1], 0]);
+    tag(rod, { name: `Cylinder ${cy.c} H-Beam Connecting Rod`, subsystem: `Reciprocating · ${bankLabel}`, material: 'Forged H-Beam 4340 Steel', spec: `${E.rod} mm C-to-C, split big-end cap & twin bolts` }, [110 * B.b[0], 110 * B.b[1], 0]);
     const beam = new THREE.Group();
     rod.add(beam);
     add(beam, new THREE.BoxGeometry(10, 1, 5), M.blackMatte);
@@ -852,7 +852,7 @@ export function buildEngine(opts = {}) {
     arrow.position.set(cyl[i].out * 78, 0, 0);
     arrow.renderOrder = 5;
     ignore(arrow);
-    return {g, rod, beam, big, small, arrow};
+    return { g, rod, beam, big, small, arrow };
   });
 
   // ------------------------------------------------------------ front: CNC spoked 2:1 timing gears (24T -> 72T -> 48T) + serpentine belt drive; rear: flywheel
@@ -883,7 +883,7 @@ export function buildEngine(opts = {}) {
     const bore = new THREE.Path();
     bore.absarc(0, 0, rHub * 0.45, 0, Math.PI * 2, true);
     sh.holes.push(bore);
-    const g = new THREE.ExtrudeGeometry(sh, {depth: width, bevelEnabled: !lo, bevelThickness: 0.8, bevelSize: 0.7, bevelSegments: 1, curveSegments: N(18)});
+    const g = new THREE.ExtrudeGeometry(sh, { depth: width, bevelEnabled: !lo, bevelThickness: 0.8, bevelSize: 0.7, bevelSegments: 1, curveSegments: N(18) });
     g.translate(0, 0, -width / 2);
     return g;
   };
@@ -891,10 +891,10 @@ export function buildEngine(opts = {}) {
   const crankGear = new THREE.Group();
   crankGear.position.z = front;
   root.add(crankGear);
-  tag(crankGear, {name: 'Crankshaft Timing Gear (24T)', subsystem: 'Timing Drive · Front', material: 'Dark Nitride-Steel Teeth / Open Alu Hub', spec: '24T, +0.35 rad helix, 2:1 drive to cams'}, [0, -110, 45]);
+  tag(crankGear, { name: 'Crankshaft Timing Gear (24T)', subsystem: 'Timing Drive · Front', material: 'Dark Nitride-Steel Teeth / Open Alu Hub', spec: '24T, +0.35 rad helix, 2:1 drive to cams' }, [0, -110, 45]);
   const nitrideMat = lo
-    ? new THREE.MeshLambertMaterial({color: '#2f343d', flatShading: true})
-    : new THREE.MeshStandardMaterial({color: '#282c34', roughness: 0.3, metalness: 0.78});
+    ? new THREE.MeshLambertMaterial({ color: '#2f343d', flatShading: true })
+    : new THREE.MeshStandardMaterial({ color: '#282c34', roughness: 0.3, metalness: 0.78 });
   add(crankGear, gear(24, 12 * TM + 2.5, 12 * TM - 2.9, 15, 0.35, 12), nitrideMat);
   addHubBolt(crankGear, 19, 8.5, 10);
 
@@ -922,7 +922,7 @@ export function buildEngine(opts = {}) {
     const idxPin = add(gg, new THREE.CylinderGeometry(3.5, 3.5, 19, 10), M.bronze);
     idxPin.rotation.x = Math.PI / 2;
     idxPin.position.set(0, 93, 0);
-    return {gg, bank, c0: 0.5 * idlerPitch};
+    return { gg, bank, c0: 0.5 * idlerPitch };
   });
 
   const camGears = ['L', 'R'].map((bank) => {
@@ -950,13 +950,13 @@ export function buildEngine(opts = {}) {
     const camDot = add(cg, new THREE.CylinderGeometry(3.5, 3.5, 19, 10), M.crimson);
     camDot.rotation.x = Math.PI / 2;
     camDot.position.set(0, 56, 0);
-    return {cg, bank};
+    return { cg, bank };
   });
 
   // Front Serpentine Accessory Dress-Up (Harmonic Damper, Water Pump + Thermostat, Vented Alternator, 5-Spoke PS Pulley, Tensioner & A/C + Closed Ribbed Belt at z = front + 62)
   const serpZ = front + 62;
-  const accRes = buildAccessoryDressup({M, DM, add, tag, N, plain, front});
-  const {damperGrp, waterPumpGrp, altGrp, psPulleyGrp, tensionerGrp, acCompressorGrp, thermostatGrp} = accRes;
+  const accRes = buildAccessoryDressup({ M, DM, add, tag, N, plain, front });
+  const { damperGrp, waterPumpGrp, altGrp, psPulleyGrp, tensionerGrp, acCompressorGrp, thermostatGrp } = accRes;
   root.add(damperGrp, waterPumpGrp, altGrp, psPulleyGrp);
   for (const g of [tensionerGrp, acCompressorGrp, thermostatGrp]) {
     if (g) {
@@ -967,17 +967,17 @@ export function buildEngine(opts = {}) {
 
   const serpGrp = new THREE.Group();
   root.add(serpGrp);
-  tag(serpGrp, {name: 'Serpentine Accessory Belt', subsystem: 'Accessory Drive · Front', material: 'EPDM Ribbed Serpentine Belt', spec: 'Wraps Crank Damper -> PS Pulley -> Water Pump -> Tensioner -> Alternator -> A/C Compressor'}, [0, -110, 115]);
+  tag(serpGrp, { name: 'Serpentine Accessory Belt', subsystem: 'Accessory Drive · Front', material: 'EPDM Ribbed Serpentine Belt', spec: 'Wraps Crank Damper -> PS Pulley -> Water Pump -> Tensioner -> Alternator -> A/C Compressor' }, [0, -110, 115]);
 
   // Extruded continuous outer serpentine belt loop wrapping Crank (r=74) -> PS Pulley (r=34) -> Water Pump (r=42) -> Tensioner (r=22) -> Alternator (r=28) -> A/C Compressor (r=32)
   {
     const serpPulleys = [
-      {x: 0, y: 0, r: 75},
-      {x: -108, y: 26, r: 35},
-      {x: 0, y: 128, r: 43},
-      {x: 76, y: 78, r: 23},
-      {x: 148, y: -10, r: 29},
-      {x: 190, y: -84, r: 33},
+      { x: 0, y: 0, r: 75 },
+      { x: -108, y: 26, r: 35 },
+      { x: 0, y: 128, r: 43 },
+      { x: 76, y: 78, r: 23 },
+      { x: 148, y: -10, r: 29 },
+      { x: 190, y: -84, r: 33 },
     ];
     const outerPts = [];
     for (let i = 0; i < serpPulleys.length; i++) {
@@ -1009,7 +1009,7 @@ export function buildEngine(opts = {}) {
     });
     innerHole.closePath();
     beltSh.holes.push(innerHole);
-    const beltGeo = new THREE.ExtrudeGeometry(beltSh, {depth: 14, bevelEnabled: false, curveSegments: N(18)});
+    const beltGeo = new THREE.ExtrudeGeometry(beltSh, { depth: 14, bevelEnabled: false, curveSegments: N(18) });
     beltGeo.translate(0, 0, -7);
     const beltMesh = add(serpGrp, beltGeo, M.beltRubber);
     beltMesh.position.z = serpZ;
@@ -1017,11 +1017,11 @@ export function buildEngine(opts = {}) {
 
   // ------------------------------------------------------------ Sculpted 8-Runner Arched Intake Plenum, Brass DBW Throttle, Fuel Rails & Injectors
   const plenumMat = lo
-    ? new THREE.MeshLambertMaterial({color: '#6b7f94', transparent: true, opacity: 0.36, depthWrite: false, side: THREE.FrontSide})
-    : new THREE.MeshPhysicalMaterial({color: '#6b7f94', roughness: 0.12, metalness: 0.05, clearcoat: 1.0, clearcoatRoughness: 0.08, transparent: true, opacity: 0.36, depthWrite: false, side: THREE.FrontSide, envMapIntensity: 1.4});
+    ? new THREE.MeshLambertMaterial({ color: '#6b7f94', transparent: true, opacity: 0.36, depthWrite: false, side: THREE.FrontSide })
+    : new THREE.MeshPhysicalMaterial({ color: '#6b7f94', roughness: 0.12, metalness: 0.05, clearcoat: 1.0, clearcoatRoughness: 0.08, transparent: true, opacity: 0.36, depthWrite: false, side: THREE.FrontSide, envMapIntensity: 1.4 });
   const brassMat = lo
-    ? new THREE.MeshLambertMaterial({color: '#c79642', flatShading: true})
-    : new THREE.MeshStandardMaterial({color: '#d4a34a', roughness: 0.24, metalness: 0.9});
+    ? new THREE.MeshLambertMaterial({ color: '#c79642', flatShading: true })
+    : new THREE.MeshStandardMaterial({ color: '#d4a34a', roughness: 0.24, metalness: 0.9 });
 
   const intakeGrp = new THREE.Group();
   root.add(intakeGrp);
@@ -1046,7 +1046,7 @@ export function buildEngine(opts = {}) {
     const tbBore = new THREE.Path();
     tbBore.absarc(0, 0, 44.5, 0, Math.PI * 2, true);
     tbFlangeSh.holes.push(tbBore);
-    const tbFlangeGeo = new THREE.ExtrudeGeometry(tbFlangeSh, {depth: 9, bevelEnabled: !lo, bevelThickness: 1, bevelSize: 1, bevelSegments: 1, curveSegments: N(24)});
+    const tbFlangeGeo = new THREE.ExtrudeGeometry(tbFlangeSh, { depth: 9, bevelEnabled: !lo, bevelThickness: 1, bevelSize: 1, bevelSegments: 1, curveSegments: N(24) });
     tbFlangeGeo.translate(0, 0, -24);
     add(tbGrp, tbFlangeGeo, M.alu);
     for (const [fx, fy] of [[-39, -39], [39, -39], [39, 39], [-39, 39]]) {
@@ -1060,7 +1060,7 @@ export function buildEngine(opts = {}) {
   const tbHole = new THREE.Path();
   tbHole.absarc(0, 0, 44.5, 0, Math.PI * 2, true);
   tbSh.holes.push(tbHole);
-  const tbHousingGeo = new THREE.ExtrudeGeometry(tbSh, {depth: 48, bevelEnabled: !lo, bevelThickness: 1.8, bevelSize: 1.4, bevelSegments: 1, curveSegments: N(30)});
+  const tbHousingGeo = new THREE.ExtrudeGeometry(tbSh, { depth: 48, bevelEnabled: !lo, bevelThickness: 1.8, bevelSize: 1.4, bevelSegments: 1, curveSegments: N(30) });
   tbHousingGeo.translate(0, 0, -24);
   const tbBody = add(tbGrp, tbHousingGeo, M.alu);
   const tbThroatMat = M.blackMatte.clone();
@@ -1171,7 +1171,7 @@ export function buildEngine(opts = {}) {
   tbNeckCollar.position.set(0, 294, 251);
 
   // Twin Slotted Crimson Billet Fuel Rails (Live Glowing Cyan-Blue Fuel Flow) + AN-8 Fittings + Crossovers + FPR Gauge
-  const anBlueMat = new THREE.MeshPhysicalMaterial({color: '#1b5fd9', roughness: 0.25, metalness: 0.45, clearcoat: 0.5});
+  const anBlueMat = new THREE.MeshPhysicalMaterial({ color: '#1b5fd9', roughness: 0.25, metalness: 0.45, clearcoat: 0.5 });
   if (lo) anBlueMat.color.set('#2864cc');
   const fuelFlowMat = makeStreamMaterial('#00b4ff', '#ecffff', 20.0);
   for (const sgn of [-1, 1]) {
@@ -1240,7 +1240,7 @@ export function buildEngine(opts = {}) {
     anHex.rotation.z = Math.PI / 2;
     anHex.position.x = sx;
   }
-  tag(anFrontBlock, {name: 'Front AN-6 Fuel Crossover Junction', subsystem: 'Fuel System · Sequential EFI', material: 'CNC 6061-T6 / Anodized AN-6 Fittings', spec: 'Equalizes 4.0 bar supply between Left & Right fuel rails'});
+  tag(anFrontBlock, { name: 'Front AN-6 Fuel Crossover Junction', subsystem: 'Fuel System · Sequential EFI', material: 'CNC 6061-T6 / Anodized AN-6 Fittings', spec: 'Equalizes 4.0 bar supply between Left & Right fuel rails' });
   const rearCrossPts = [new V3(-96, 250, -196), new V3(-50, 262, -206), new V3(0, 264, -208), new V3(50, 262, -206), new V3(96, 250, -196)];
   add(intakeGrp, new THREE.TubeGeometry(new THREE.CatmullRomCurve3(rearCrossPts), N(18), 5.2, 8, false), M.steel);
   const fpr = add(intakeGrp, new THREE.CylinderGeometry(14, 14, 22, N(16)), M.alu);
@@ -1252,7 +1252,7 @@ export function buildEngine(opts = {}) {
   fprGauge.position.set(0, 298, -214);
   fprGauge.rotation.x = -0.35;
   intakeGrp.add(fprGauge);
-  tag(fprGauge, {name: 'Fuel Pressure Gauge & FPR', subsystem: 'Fuel System · Sequential EFI', material: 'CNC 6061-T6 / Tempered Dial Glass', spec: '4.0–5.0 bar boost-referenced pressure gauge & billet FPR'});
+  tag(fprGauge, { name: 'Fuel Pressure Gauge & FPR', subsystem: 'Fuel System · Sequential EFI', material: 'CNC 6061-T6 / Tempered Dial Glass', spec: '4.0–5.0 bar boost-referenced pressure gauge & billet FPR' });
   const gBezel = add(fprGauge, new THREE.CylinderGeometry(16, 16, 8, N(22)), M.alu);
   gBezel.rotation.x = Math.PI / 2;
   const gDial = add(fprGauge, new THREE.CylinderGeometry(13.2, 13.2, 1.5, N(22)), M.ceramic);
@@ -1272,7 +1272,7 @@ export function buildEngine(opts = {}) {
   gGlass.position.z = -5.4;
 
   // ---- Unified Sculpted LS-Style 8-Rib Manifold Shell (single seamless lofted BufferGeometry, z=-204..+252) ----
-  const injSprayMatBase = new THREE.MeshBasicMaterial({color: '#28b8ff', transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide});
+  const injSprayMatBase = new THREE.MeshBasicMaterial({ color: '#28b8ff', transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide });
 
   (function buildUnifiedManifoldShell() {
     const RZ = [175, 125, 75, 25, -25, -75, -125, -175];
@@ -1378,7 +1378,7 @@ export function buildEngine(opts = {}) {
       stub.scale.z = 1.28;
       stub.position.z = cy.z;
       stub.renderOrder = 4;
-      tag(stub, {name: `Cyl ${cy.c} Intake Port Runner`, subsystem: 'Induction · Cross-Ram Manifold', material: 'Composite Runner', spec: 'Contoured port duct from valley plenum beneath fuel rail to head port'}, [0, 260, 0]);
+      tag(stub, { name: `Cyl ${cy.c} Intake Port Runner`, subsystem: 'Induction · Cross-Ram Manifold', material: 'Composite Runner', spec: 'Contoured port duct from valley plenum beneath fuel rail to head port' }, [0, 260, 0]);
 
       const portCollar = add(intakeGrp, new THREE.CylinderGeometry(16, 17, 10, N(16)), M.alu);
       portCollar.position.set(out * 124, 212, cy.z);
@@ -1428,7 +1428,7 @@ export function buildEngine(opts = {}) {
     ignore(ribbon);
     intakeGrp.add(ribbon);
     plenumStreams.push(ribbon);
-    return {curve, phase: ri / 3};
+    return { curve, phase: ri / 3 };
   });
 
   // 8 internal flared chrome velocity stacks, short machined trumpet collars & visible glowing intake mist streams
@@ -1478,15 +1478,15 @@ export function buildEngine(opts = {}) {
     xrayKeep(spray);
     ignore(spray);
     inj.add(spray);
-    tag(inj, {name: `Cyl ${cy.c} Port Fuel Injector`, subsystem: 'Fuel System · Sequential EFI', material: 'Bronze Pintle / Crimson Solenoid', spec: `4.0 bar multi-hole spray during ${cy.c} intake stroke`});
-    return {cy, spray, sprayMat, runnerSwirl, swirlMat, runnerCurve};
+    tag(inj, { name: `Cyl ${cy.c} Port Fuel Injector`, subsystem: 'Fuel System · Sequential EFI', material: 'Bronze Pintle / Crimson Solenoid', spec: `4.0 bar multi-hole spray during ${cy.c} intake stroke` });
+    return { cy, spray, sprayMat, runnerSwirl, swirlMat, runnerCurve };
   });
 
   // Atomized fuel-air droplet beads streaming continuously through throttle -> impeller -> plenum -> all 8 runner horns
   const PLENUM_BEADS = 48;
   const RUNNER_BEADS_EACH = 10;
   const TOTAL_BEADS = PLENUM_BEADS + CYL.length * RUNNER_BEADS_EACH;
-  const dropletMat = new THREE.MeshBasicMaterial({color: '#9cf5ff', transparent: true, opacity: 0.9, depthWrite: false});
+  const dropletMat = new THREE.MeshBasicMaterial({ color: '#9cf5ff', transparent: true, opacity: 0.9, depthWrite: false });
   const dropletMesh = new THREE.InstancedMesh(new THREE.SphereGeometry(2.5, 6, 5), dropletMat, TOTAL_BEADS);
   dropletMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
   dropletMesh.renderOrder = 3;
@@ -1529,7 +1529,7 @@ export function buildEngine(opts = {}) {
     cg.add(flameGrp);
     const coreMat = makeCollectorFlameMaterial(true);
     const outerMat = makeCollectorFlameMaterial(false);
-    const emberMat = new THREE.MeshBasicMaterial({color: '#ffbe4a', transparent: true, opacity: 0.92, depthWrite: false});
+    const emberMat = new THREE.MeshBasicMaterial({ color: '#ffbe4a', transparent: true, opacity: 0.92, depthWrite: false });
     const coreMesh = new THREE.Mesh(new THREE.ConeGeometry(10.5, 76, N(20), 8, true), coreMat);
     coreMesh.rotation.x = -Math.PI / 2;
     coreMesh.position.z = -36;
@@ -1540,22 +1540,22 @@ export function buildEngine(opts = {}) {
     outerMesh.renderOrder = 5;
     flameGrp.add(outerMesh, coreMesh);
     const emberGeo = new THREE.OctahedronGeometry(2.6, 0);
-    const embers = Array.from({length: 10}, (_, k) => {
+    const embers = Array.from({ length: 10 }, (_, k) => {
       const em = new THREE.Mesh(emberGeo, emberMat);
       em.renderOrder = 7;
       flameGrp.add(em);
-      return {m: em, phase: k / 10, ang: k * 2.39996};
+      return { m: em, phase: k / 10, ang: k * 2.39996 };
     });
     xrayKeep(flameGrp);
     ignore(flameGrp);
-    return {cg, bank, out, flameGrp, coreMat, outerMat, emberMat, embers};
+    return { cg, bank, out, flameGrp, coreMat, outerMat, emberMat, embers };
   });
 
   // Sculpted A356 Cast-Aluminum Front Timing Cover Chest (visible behind open CNC gear spoke windows)
   const timingCover = new THREE.Group();
   timingCover.position.z = 250;
   root.add(timingCover);
-  tag(timingCover, {name: 'Cast-Aluminum Timing Cover Chest', subsystem: 'Timing Drive · Front', material: 'Die-Cast A356 Aluminum / Gunmetal Bearing Carriers', spec: 'Sculpted front chest with machined crank/idler/cam bearing bosses'}, [0, 0, 28]);
+  tag(timingCover, { name: 'Cast-Aluminum Timing Cover Chest', subsystem: 'Timing Drive · Front', material: 'Die-Cast A356 Aluminum / Gunmetal Bearing Carriers', spec: 'Sculpted front chest with machined crank/idler/cam bearing bosses' }, [0, 0, 28]);
   {
     const tcSh = new THREE.Shape();
     tcSh.moveTo(-66, -74);
@@ -1574,7 +1574,7 @@ export function buildEngine(opts = {}) {
       ch.absarc((DECK + 112) * B.b[0], (DECK + 112) * B.b[1], 16, 0, Math.PI * 2, true);
       tcSh.holes.push(ch);
     }
-    const tcGeo = new THREE.ExtrudeGeometry(tcSh, {depth: 10, bevelEnabled: true, bevelThickness: 1.4, bevelSize: 1.4, bevelSegments: 1, curveSegments: 12});
+    const tcGeo = new THREE.ExtrudeGeometry(tcSh, { depth: 10, bevelEnabled: true, bevelThickness: 1.4, bevelSize: 1.4, bevelSegments: 1, curveSegments: 12 });
     tcGeo.translate(0, 0, -5);
     add(timingCover, tcGeo, M.alu);
     // Machined gunmetal bearing carrier bosses + radial stiffener ribs behind open gear windows
@@ -1602,14 +1602,14 @@ export function buildEngine(opts = {}) {
   const bellRing = new THREE.Group();
   bellRing.position.z = -254;
   root.add(bellRing);
-  tag(bellRing, {name: 'Bellhousing Flange & Rear Seal', subsystem: 'Rotating Assembly · Rear', material: 'CNC 6061-T6 Bellhousing Arch / Steel Dowels', spec: 'Rear transmission adapter arch with sculpted mount ears, twin dowels & rear main seal'}, [0, 0, -55]);
+  tag(bellRing, { name: 'Bellhousing Flange & Rear Seal', subsystem: 'Rotating Assembly · Rear', material: 'CNC 6061-T6 Bellhousing Arch / Steel Dowels', spec: 'Rear transmission adapter arch with sculpted mount ears, twin dowels & rear main seal' }, [0, 0, -55]);
   // Sculpted upper bellhousing alignment arch + perimeter mounting ears + machined rear main seal plate
   {
     const bhSh = new THREE.Shape();
     bhSh.absarc(0, 0, 194, -0.34, Math.PI + 0.34, false);
     bhSh.absarc(0, 0, 158, Math.PI + 0.34, -0.34, true);
     bhSh.closePath();
-    const bhGeo = new THREE.ExtrudeGeometry(bhSh, {depth: 14, bevelEnabled: !lo, bevelThickness: 1.2, bevelSize: 1.0, bevelSegments: 1, curveSegments: N(36)});
+    const bhGeo = new THREE.ExtrudeGeometry(bhSh, { depth: 14, bevelEnabled: !lo, bevelThickness: 1.2, bevelSize: 1.0, bevelSegments: 1, curveSegments: N(36) });
     bhGeo.translate(0, 0, -7);
     add(bellRing, bhGeo, M.alu);
     const topArchPad = add(bellRing, new THREE.BoxGeometry(58, 22, 16), M.alu);
@@ -1664,7 +1664,7 @@ export function buildEngine(opts = {}) {
   const flywheel = new THREE.Group();
   flywheel.position.z = -290;
   root.add(flywheel);
-  tag(flywheel, {name: 'Machined Flywheel & Ring Gear', subsystem: 'Rotating Assembly · Rear', material: 'Billet Chromoly / 120T Steel Ring / Stepped 8-Bolt Hub', spec: 'Ø300 mm lightened stepped flywheel, 120T ring gear, 8-bolt crank flange'}, [0, -110, -90]);
+  tag(flywheel, { name: 'Machined Flywheel & Ring Gear', subsystem: 'Rotating Assembly · Rear', material: 'Billet Chromoly / 120T Steel Ring / Stepped 8-Bolt Hub', spec: 'Ø300 mm lightened stepped flywheel, 120T ring gear, 8-bolt crank flange' }, [0, -110, -90]);
   add(flywheel, new THREE.CylinderGeometry(150, 150, 18, N(72)), M.gunmetal).rotation.x = Math.PI / 2;
   add(flywheel, gear(120, 166, 158, 20, 0, 140), M.blackMatte);
   // Recessed dark matte backing + flush 6-pocket ExtrudeGeometry machined steel friction ring (zero Z-fighting or gap)
@@ -1683,7 +1683,7 @@ export function buildEngine(opts = {}) {
       hole.absarc(Math.cos(a) * 90, Math.sin(a) * 90, 16, 0, Math.PI * 2, true);
       fwSh.holes.push(hole);
     }
-    const faceGeo = new THREE.ExtrudeGeometry(fwSh, {depth: 4, bevelEnabled: !lo, bevelThickness: 0.6, bevelSize: 0.6, bevelSegments: 1, curveSegments: N(32)});
+    const faceGeo = new THREE.ExtrudeGeometry(fwSh, { depth: 4, bevelEnabled: !lo, bevelThickness: 0.6, bevelSize: 0.6, bevelSegments: 1, curveSegments: N(32) });
     const frictionFace = add(flywheel, faceGeo, M.steel);
     frictionFace.position.z = -12.6;
   }
@@ -1730,7 +1730,7 @@ export function buildEngine(opts = {}) {
   const Z_CUT = new V3(0, 0, -1);
 
   const xrayMat = lo
-    ? new THREE.MeshLambertMaterial({color: '#5eb8f2', transparent: true, opacity: 0.16, depthWrite: false, side: THREE.FrontSide})
+    ? new THREE.MeshLambertMaterial({ color: '#5eb8f2', transparent: true, opacity: 0.16, depthWrite: false, side: THREE.FrontSide })
     : makeXrayMaterial();
   if (tensionerGrp?.pulley) xrayKeep(tensionerGrp.pulley);
   if (acCompressorGrp?.pulley) xrayKeep(acCompressorGrp.pulley);
@@ -1784,7 +1784,7 @@ export function buildEngine(opts = {}) {
     const inc = THREE.IncrementWrapStencilOp;
     const dec = THREE.DecrementWrapStencilOp;
     const count = (side, op) =>
-      new THREE.MeshBasicMaterial({side, colorWrite: false, depthWrite: false, depthTest: false, stencilWrite: true, stencilFunc: THREE.AlwaysStencilFunc, stencilFail: op, stencilZFail: op, stencilZPass: op, clippingPlanes: [CLIP]});
+      new THREE.MeshBasicMaterial({ side, colorWrite: false, depthWrite: false, depthTest: false, stencilWrite: true, stencilFunc: THREE.AlwaysStencilFunc, stencilFail: op, stencilZFail: op, stencilZPass: op, clippingPlanes: [CLIP] });
     helpers.push(count(THREE.BackSide, inc), count(THREE.FrontSide, dec));
     const parts = [];
     const bbSize = new V3();
@@ -1809,7 +1809,7 @@ export function buildEngine(opts = {}) {
     const rep = THREE.ReplaceStencilOp;
     cap = new THREE.Mesh(
       new THREE.PlaneGeometry(2.4, 2.4),
-      new THREE.MeshStandardMaterial({color: opts.caps, roughness: 0.55, metalness: 0, side: THREE.DoubleSide, stencilWrite: true, stencilRef: 0, stencilFunc: THREE.NotEqualStencilFunc, stencilFail: rep, stencilZFail: rep, stencilZPass: rep}),
+      new THREE.MeshStandardMaterial({ color: opts.caps, roughness: 0.55, metalness: 0, side: THREE.DoubleSide, stencilWrite: true, stencilRef: 0, stencilFunc: THREE.NotEqualStencilFunc, stencilFail: rep, stencilZFail: rep, stencilZPass: rep }),
     );
     cap.renderOrder = 1.1;
     cap.userData.ignoreInspect = true;
@@ -1992,7 +1992,7 @@ export function buildEngine(opts = {}) {
     const cAng = -th * D2R;
     crank.rotation.z = 0;
     crank.position.y = -DK;
-    for (const {w, p} of webs) w.rotation.z = -(th + PIN_PHASE[p]) * D2R;
+    for (const { w, p } of webs) w.rotation.z = -(th + PIN_PHASE[p]) * D2R;
     E.pinZ.forEach((z, p) => {
       const [x, y] = pinXY(p, th);
       pins[p].position.set(x, y - DK, z);
@@ -2056,7 +2056,7 @@ export function buildEngine(opts = {}) {
 
     CYL.forEach((cy, i) => {
       const B = BANK[cy.bank];
-      const {s, P, pin} = piston(i, th);
+      const { s, P, pin } = piston(i, th);
       const pp = pist[i];
       pp.g.position.y = s + DP;
       tmpA.set(P[0], P[1], cy.z);
@@ -2166,7 +2166,7 @@ export function buildEngine(opts = {}) {
         if (v.rocker) v.rocker.rotation.z = -Math.sign(v.x) * rockerAngle(liftNorm);
       }
 
-      const {s: s2} = piston(i, th + 2);
+      const { s: s2 } = piston(i, th + 2);
       const vel = s2 - s;
       pp.arrow.position.y = DECK - 70;
       pp.arrow.rotation.z = vel > 0 ? 0 : Math.PI;
@@ -2222,12 +2222,12 @@ export function buildEngine(opts = {}) {
     }
     crankGear.rotation.z = cAng;
     crankGear.position.set(0, -DK, front + 45 * eCrank);
-    camGears.forEach(({cg, bank}) => {
+    camGears.forEach(({ cg, bank }) => {
       const B = BANK[bank];
       cg.rotation.z = cAng / 2;
       cg.position.set((DECK + 112 + DC) * B.b[0], (DECK + 112 + DC) * B.b[1], front + 45 * eCrank);
     });
-    idlers.forEach(({gg, bank, c0}) => {
+    idlers.forEach(({ gg, bank, c0 }) => {
       const B = BANK[bank];
       gg.rotation.z = c0 - cAng * (24 / 72);
       gg.position.set(150.222 * B.b[0], 150.222 * B.b[1], front + 45 * eCrank);
@@ -2295,7 +2295,7 @@ export function buildEngine(opts = {}) {
     });
     for (const c of cams) c.g.visible = all || CYL[solo].bank === c.bank;
     const soloPin = all ? -1 : CYL[solo].pin;
-    for (const {w, p} of webs) w.visible = all || p === soloPin;
+    for (const { w, p } of webs) w.visible = all || p === soloPin;
     pins.forEach((m, p) => (m.visible = all || p === soloPin));
     for (const j of journals) j.visible = all;
     arcs.visible = all && (ops.arrows ?? 1) > 0.01;
@@ -2310,7 +2310,7 @@ export function buildEngine(opts = {}) {
       collectors.forEach((colObj) => CYL[solo].bank !== colObj.bank && rest.push(colObj.cg));
       cyl.forEach((c, i) => i !== solo && rest.push(c.g, pist[i].rod));
       for (const c of cams) if (CYL[solo].bank !== c.bank) rest.push(c.g);
-      for (const {w, p} of webs) if (p !== soloPin) rest.push(w);
+      for (const { w, p } of webs) if (p !== soloPin) rest.push(w);
       pins.forEach((m, p) => p !== soloPin && rest.push(m));
       for (const [m, g] of GHOST) g.opacity = (m.transparent ? m.opacity : 1) * aRest;
       for (const o of rest) {
@@ -2325,5 +2325,5 @@ export function buildEngine(opts = {}) {
     }
   };
   root.scale.setScalar(0.001);
-  return {root, update, M, cyl, pist, cams, crank, damperGrp, waterPumpGrp, altGrp, psPulleyGrp, ...(tensionerGrp ? {tensionerGrp} : {}), ...(acCompressorGrp ? {acCompressorGrp} : {}), ...(thermostatGrp ? {thermostatGrp} : {}), ...(sparkLeadsGrp ? {sparkLeadsGrp} : {}), ...(harnessGrp ? {harnessGrp} : {}), coversGrp, flywheel, timingCover, bellRing, crankGear, camGears, idlers, intakeGrp, collectors, serpGrp, setCut, setRefract, setXray, setWireframe, CLIP, cap};
+  return { root, update, M, cyl, pist, cams, crank, damperGrp, waterPumpGrp, altGrp, psPulleyGrp, ...(tensionerGrp ? { tensionerGrp } : {}), ...(acCompressorGrp ? { acCompressorGrp } : {}), ...(thermostatGrp ? { thermostatGrp } : {}), ...(sparkLeadsGrp ? { sparkLeadsGrp } : {}), ...(harnessGrp ? { harnessGrp } : {}), coversGrp, flywheel, timingCover, bellRing, crankGear, camGears, idlers, intakeGrp, collectors, serpGrp, setCut, setRefract, setXray, setWireframe, isWireframe: () => wireOn, CLIP, cap };
 }
