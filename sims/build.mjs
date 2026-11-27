@@ -133,6 +133,7 @@ ${js}
 `;
   const out = path.join(DIST, `${name}.html`);
   fs.writeFileSync(out, html);
+  if (name === 'studio') fs.writeFileSync(path.join(DIST, 'index.html'), html);
   const listFile = path.join(DIST, `${name}.assets.json`);
   assets.push(...(bcfg.files || []).map((f) => path.join(DEPS, f)));
   if (assets.length) {
