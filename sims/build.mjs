@@ -110,11 +110,12 @@ for (const arg of names) {
   const js = res.outputFiles[0].text.replace(/<\/script/g, '<\\/script');
   const css = fs.existsSync(path.join(dir, 'style.css')) ? fs.readFileSync(path.join(dir, 'style.css'), 'utf8') : '';
   const favicon = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2316181d'/%3E%3Ccircle cx='16' cy='16' r='8.5' fill='none' stroke='%23d6182b' stroke-width='3' stroke-dasharray='3.2 2.1'/%3E%3Ccircle cx='16' cy='16' r='3.2' fill='%23f3f3f4'/%3E%3C/svg%3E";
+  const isStudio = name === 'studio';
   const html = `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">${isStudio ? '\n<meta name="color-scheme" content="light">' : ''}
 <link rel="icon" type="image/svg+xml" href="${favicon}">
 <title>${name}</title>
 <style>

@@ -11,13 +11,20 @@
   --st-rust: #d95126;
   --st-ochre: #d47431;
   --st-pill-bg: #fff6ec;
+  /* Override kit/HUD dark-theme variables so no dark bleed-through occurs */
+  --bg: #f4efe6;
+  --fg: #120d0a;
+  --panel: rgba(244, 239, 230, 0.93);
+  color-scheme: light;
 }
 
 html, body {
   height: auto !important;
   min-height: 100%;
+  background: #f4efe6 !important;
   background: var(--st-bg) !important;
-  color: var(--st-ink);
+  color: var(--st-ink) !important;
+  color-scheme: light !important;
   overflow: auto !important;
   scroll-behavior: smooth;
 }
