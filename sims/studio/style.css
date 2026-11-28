@@ -1,5 +1,6 @@
 /* Shattercraft Studio Hub — Unified Editorial Broadsheet UI (Vermilion #f26a3d · Cream #f4efe6 · Espresso #120d0a) */
 :root {
+  color-scheme: light only;
   --st-bg: #f4efe6;
   --st-card: #fffaf2;
   --st-panel: #f7f0e4;
