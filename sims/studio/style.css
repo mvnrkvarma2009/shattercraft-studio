@@ -822,3 +822,15 @@ html, body {
   display: block;
   background: #120d0a;
 }
+
+@media (max-width: 540px) {
+  .cta04-topbar { padding: 12px 14px 0; gap: 8px; }
+  .cta04-chip { height: 28px; padding: 0 10px; font-size: 9.5px; }
+  .cta-04 .news { padding: 14px 14px 16px; }
+  .cta-04 h1.cta04-h { font-size: clamp(32px, 9.5vw, 44px); }
+  .cta04-launchbar { border-radius: 18px; padding: 6px; width: 100%; }
+  .cta04-pill { height: 38px; padding: 0 14px; font-size: 13px; }
+  .issue { border-radius: 12px 12px 0 0; }
+  .issue-canvas { aspect-ratio: 4 / 3; }
+  .studio-shell { padding: 24px 14px 36px; }
+}

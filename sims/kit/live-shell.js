@@ -69,7 +69,16 @@ html,body{background:${theme.bg};overflow:hidden}
 .live-ctx button:hover{background:rgba(242,106,61,.14);color:${theme.accent}}
 .live-ctx kbd{font-size:9.5px;opacity:.55;font-weight:600}
 @keyframes live-blink{50%{opacity:.15}}
-@media (orientation:portrait) and (max-width:820px){.turn{display:block}}
+.live-mob-top,.live-mob-dock{display:none}
+@media (orientation:portrait) and (max-width:820px){
+  .turn{display:none}
+  .live-mob-top{position:fixed;left:10px;right:10px;top:max(10px,env(safe-area-inset-top));z-index:90;display:flex;align-items:center;justify-content:space-between;gap:6px;pointer-events:none}
+  .live-mob-dock{position:fixed;left:10px;right:10px;bottom:max(12px,env(safe-area-inset-bottom));z-index:90;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px;padding:8px 10px;border:1px solid ${theme.border};border-radius:12px;background:${theme.panel};box-shadow:0 12px 30px rgba(15,12,8,.16);backdrop-filter:blur(8px)}
+  .live-mob-btn{appearance:none;display:inline-flex;align-items:center;justify-content:center;gap:5px;min-height:36px;padding:0 11px;border:1px solid ${theme.border};border-radius:8px;background:${theme.panel};color:${theme.ink};font:700 10.5px 'JetBrains Mono',Inter,monospace;letter-spacing:.7px;cursor:pointer;pointer-events:auto;white-space:nowrap}
+  .live-mob-btn.on{border-color:${theme.accent};color:${theme.accent}}
+  .live-mob-range{display:flex;align-items:center;gap:6px;font:700 10px 'JetBrains Mono',monospace;color:${theme.mute};padding:0 4px}
+  .live-mob-range input{width:74px;accent-color:${theme.accent}}
+}
 `;
 
 /**
@@ -253,8 +262,35 @@ export function createLiveShell(opts = {}) {
 
   const tierLabel = (i) => tiers[i]?.name || ['HIGH', 'MED', 'LOW'][i] || `T${i + 1}`;
 
+  let mobileFullHud = false;
+  const mobTop = document.createElement('div');
+  mobTop.className = 'live-mob-top';
+  mobTop.dataset.testid = 'mobile-top';
+  mobTop.innerHTML = [
+    '<button type="button" class="live-mob-btn" data-m="back">← STUDIO</button>',
+    '<div style="display:flex;gap:6px;pointer-events:auto">',
+    '<button type="button" class="live-mob-btn on" data-m="tour">TOUR</button>',
+    '<button type="button" class="live-mob-btn" data-m="sound">SOUND</button>',
+    '<button type="button" class="live-mob-btn" data-m="hud">HUD</button>',
+    '</div>',
+  ].join('');
+  document.body.appendChild(mobTop);
+
+  const mobDock = document.createElement('div');
+  mobDock.className = 'live-mob-dock';
+  mobDock.dataset.testid = 'mobile-dock';
+  mobDock.innerHTML = [
+    '<button type="button" class="live-mob-btn" data-m="pause">PAUSE</button>',
+    '<button type="button" class="live-mob-btn" data-m="view">VIEW</button>',
+    '<button type="button" class="live-mob-btn" data-m="xray">X-RAY</button>',
+    '<label class="live-mob-range">EXP<input type="range" min="0" max="1" step="0.01" value="0" data-m="exp"></label>',
+    '<button type="button" class="live-mob-btn" data-m="reset">RESET</button>',
+  ].join('');
+  document.body.appendChild(mobDock);
+
   const fit = () => {
     const h = innerHeight - top;
+    const mobPortrait = innerWidth <= 820 && innerHeight > innerWidth;
     scale = Math.min(innerWidth / STAGE_W, h / STAGE_H);
     app.style.transform = `translate(${(innerWidth - STAGE_W * scale) / 2}px, ${top + (h - STAGE_H * scale) / 2}px) scale(${scale})`;
     const glW = Math.max(STAGE_W, innerWidth / (scale || 1));
@@ -264,6 +300,9 @@ export function createLiveShell(opts = {}) {
     canvas.style.top = `${-(glH - STAGE_H) / 2}px`;
     canvas.style.width = `${glW}px`;
     canvas.style.height = `${glH}px`;
+    bar.style.display = mobPortrait ? 'none' : '';
+    const uiSvg = app.querySelector(':scope > svg');
+    if (uiSvg) uiSvg.style.display = mobPortrait && !mobileFullHud ? 'none' : '';
     if (stage?.resize) {
       const prMax = tiers[tier]?.pr ?? 2;
       stage.resize(glW, glH, clamp((devicePixelRatio || 1) * scale, 0.75, prMax));
@@ -296,8 +335,55 @@ export function createLiveShell(opts = {}) {
   const renderTourChip = () => {
     tourChip.classList.toggle('on', AP.on);
     tourChip.innerHTML = AP.on ? '<i></i>AUTO TOUR · CLICK TO TAKE OVER' : '▶ RESUME TOUR';
+    const mt = mobTop.querySelector('[data-m="tour"]');
+    if (mt) {
+      mt.classList.toggle('on', AP.on);
+      mt.textContent = AP.on ? 'TOUR: ON' : '▶ TOUR';
+    }
   };
   renderTourChip();
+
+  let mobViewIdx = 0;
+  let mobPaused = false;
+  mobTop.addEventListener('pointerdown', (e) => e.stopPropagation());
+  mobTop.addEventListener('click', (e) => {
+    const m = e.target.closest('[data-m]')?.dataset?.m;
+    if (!m) return;
+    if (m === 'back') goBackToStudio();
+    else if (m === 'tour') { if (AP.on) takeOver(); else startTour(); }
+    else if (m === 'sound') void setSound(!soundOn);
+    else if (m === 'hud') {
+      mobileFullHud = !mobileFullHud;
+      e.target.closest('[data-m]').classList.toggle('on', mobileFullHud);
+      fit();
+    }
+  });
+  mobDock.addEventListener('pointerdown', (e) => e.stopPropagation());
+  mobDock.addEventListener('click', (e) => {
+    const m = e.target.closest('[data-m]')?.dataset?.m;
+    if (!m) return;
+    if (m === 'pause') {
+      mobPaused = !mobPaused;
+      e.target.closest('[data-m]').textContent = mobPaused ? 'PLAY' : 'PAUSE';
+      dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+    } else if (m === 'view') {
+      mobViewIdx = (mobViewIdx % 4) + 1;
+      dispatchEvent(new KeyboardEvent('keydown', { key: String(mobViewIdx), bubbles: true }));
+    } else if (m === 'xray') {
+      const v8x = document.querySelector('[data-testid="v8-xray"]');
+      if (v8x) v8x.click();
+      else dispatchEvent(new KeyboardEvent('keydown', { key: 'y', bubbles: true }));
+    } else if (m === 'reset') {
+      resetBtn.click();
+      const rng = mobDock.querySelector('[data-m="exp"]');
+      if (rng) rng.value = '0';
+    }
+  });
+  mobDock.querySelector('[data-m="exp"]')?.addEventListener('input', (e) => {
+    lastInput = T;
+    takeOver();
+    setExplode(parseFloat(e.target.value));
+  });
 
   const touch = () => {
     lastInput = T;

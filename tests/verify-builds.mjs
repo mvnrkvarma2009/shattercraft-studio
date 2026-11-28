@@ -887,6 +887,39 @@ async function main() {
       console.log('  [ok] v8-live.html 5.2s Q: HIGH soak + continuous GLASS (X-RAY + WIRE) Auto-Tour loop');
     }
 
+    // 7. Mobile portrait (390x844) Studio Hub & Live Simulators check
+    {
+      const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+      const p = await ctx.newPage();
+      const errors = [];
+      p.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`));
+      p.on('console', (m) => { if (m.type() === 'error') errors.push(`console.error: ${m.text()}`); });
+
+      await p.goto(pathToFileURL(path.join(DIST, 'studio.html')).href, { waitUntil: 'domcontentloaded' });
+      await p.waitForSelector('.cta04-h');
+      const overflow = await p.evaluate(() => document.documentElement.scrollWidth - innerWidth);
+      assert.ok(overflow <= 2, `studio.html mobile horizontal overflow (${overflow}px)`);
+
+      await p.goto(pathToFileURL(path.join(DIST, 'v8-live.html')).href, { waitUntil: 'domcontentloaded' });
+      await p.waitForFunction(() => window.SIM_SHOWN === true, { timeout: 25000 });
+      const mobCheck = await p.evaluate(() => {
+        const gl = document.getElementById('gl')?.getBoundingClientRect();
+        const topBar = document.querySelector('[data-testid="mobile-top"]');
+        const dock = document.querySelector('[data-testid="mobile-dock"]');
+        return {
+          glW: Math.round(gl?.width || 0),
+          glH: Math.round(gl?.height || 0),
+          topVis: !!topBar && getComputedStyle(topBar).display !== 'none',
+          dockVis: !!dock && getComputedStyle(dock).display !== 'none',
+        };
+      });
+      assert.ok(mobCheck.glW >= 389 && mobCheck.glH >= 843, `v8-live mobile #gl not full-bleed (${mobCheck.glW}x${mobCheck.glH})`);
+      assert.ok(mobCheck.topVis && mobCheck.dockVis, 'v8-live mobile top/dock HUD should be visible on 390x844');
+      assert.deepEqual(errors, [], `Mobile console/page errors:\n${errors.join('\n')}`);
+      await ctx.close();
+      console.log('  [ok] mobile portrait [390x844] studio.html + v8-live.html full-bleed & HUD');
+    }
+
     console.log('\nAll build, layout, WebGL, and interactive verification checks PASSED.');
   } finally {
     await browser.close();

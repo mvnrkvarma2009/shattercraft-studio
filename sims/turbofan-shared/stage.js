@@ -141,8 +141,9 @@ export function createTurbofanStage({canvas, look = {}}) {
     renderer.setSize(w, h, false);
     composer.setPixelRatio(pr);
     composer.setSize(w, h);
-    camera.fov = (w / h < 16 / 9) ? (2 * Math.atan(Math.tan((BASE_FOV * Math.PI) / 360) * ((16 / 9) / (w / h))) * 180) / Math.PI : BASE_FOV;
-    camera.aspect = w / h;
+    const aspect = w / h;
+    camera.fov = aspect < 16 / 9 ? Math.min(54, (2 * Math.atan(Math.tan((BASE_FOV * Math.PI) / 360) * ((16 / 9) / aspect)) * 180) / Math.PI) : BASE_FOV;
+    camera.aspect = aspect;
     camera.updateProjectionMatrix();
   };
 

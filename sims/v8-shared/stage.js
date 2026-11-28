@@ -141,7 +141,7 @@ export function createV8Stage({ canvas, look = {} }) {
     composer.setPixelRatio(pr);
     composer.setSize(w, h);
     const aspect = w / h;
-    camera.fov = aspect < 16 / 9 ? (2 * Math.atan(Math.tan((BASE_FOV * Math.PI) / 360) * ((16 / 9) / aspect)) * 180) / Math.PI : BASE_FOV;
+    camera.fov = aspect < 16 / 9 ? Math.min(54, (2 * Math.atan(Math.tan((BASE_FOV * Math.PI) / 360) * ((16 / 9) / aspect)) * 180) / Math.PI) : BASE_FOV;
     camera.aspect = aspect;
     camera.updateProjectionMatrix();
   };

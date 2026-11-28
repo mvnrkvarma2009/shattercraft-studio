@@ -377,7 +377,7 @@ export function createBeestStage({canvas, palette = 'sand', ink = 0}) {
     composer.setSize(w, h);
     inkPass.material.uniforms.uPx.value.set(1 / (w * pr), 1 / (h * pr));
     const aspect = w / h;
-    camera.fov = aspect < 16 / 9 ? (2 * Math.atan(Math.tan((BASE_FOV * Math.PI) / 360) * ((16 / 9) / aspect)) * 180) / Math.PI : BASE_FOV;
+    camera.fov = aspect < 16 / 9 ? Math.min(54, (2 * Math.atan(Math.tan((BASE_FOV * Math.PI) / 360) * ((16 / 9) / aspect)) * 180) / Math.PI) : BASE_FOV;
     camera.aspect = aspect;
     camera.updateProjectionMatrix();
   };

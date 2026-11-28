@@ -322,11 +322,14 @@ export function createInspector(opts) {
       sx = (tmpV.x * 0.5 + 0.5) * gw - (gw - stageSize.w) * 0.5;
       sy = (-tmpV.y * 0.5 + 0.5) * gh - (gh - stageSize.h) * 0.5;
     }
-    const tw = tip.offsetWidth || 220;
-    const th = tip.offsetHeight || 72;
-    const x = clamp(sx + 18, 14, stageSize.w - tw - 14);
-    const y = clamp(sy + 18, 14, stageSize.h - th - 14);
-    tip.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`;
+    const mob = innerWidth <= 820 && innerHeight > innerWidth;
+    const inv = mob ? Math.min(3.2, stageSize.w / Math.max(320, innerWidth)) : 1;
+    const tw = (tip.offsetWidth || 220) * inv;
+    const th = (tip.offsetHeight || 72) * inv;
+    const x = mob ? Math.max(14, (stageSize.w - tw) * 0.5) : clamp(sx + 18, 14, stageSize.w - tw - 14);
+    const y = mob ? Math.max(14, stageSize.h - th - 190) : clamp(sy + 18, 14, stageSize.h - th - 14);
+    tip.style.transformOrigin = 'top left';
+    tip.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)${mob ? ` scale(${inv.toFixed(2)})` : ''}`;
   };
 
   const clientToStage = (cx, cy) => {
